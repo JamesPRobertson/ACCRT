@@ -34,7 +34,7 @@ void init_physics() {
     }
 }
 
-void initGraphics() {
+void init_graphics() {
     TCHAR szName[] = TEXT("Local\\acpmf_graphics");
     m_graphics.hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SPageFileGraphic), szName);
     if (!m_graphics.hMapFile) {
@@ -106,7 +106,7 @@ inline void print_vector_data(const string name, const T(&v)[S][S2]) {
 
 int _tmain(int argc, _TCHAR* argv[]) {
     init_physics();
-    initGraphics();
+    init_graphics();
     init_static();
 
     wcout << "Press 1 for physics, 2 for graphics, 3 for static" << endl;
