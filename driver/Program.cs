@@ -1,5 +1,9 @@
-﻿using SharedMemory;
+﻿// Suppresses unused variables warning for the struct that follows.
+#pragma warning disable CS0414
+
+using SharedMemory;
 using System;
+
 
 struct SPageFileStatic {
    string smVersion = "";
@@ -119,26 +123,36 @@ struct SPageFileGraphic {
 };
 */
 
-namespace Program {
+// Restore the warning for unassigned variables.
+#pragma warning restore CS0414
+
+
+namespace Driver {
    class Thing {
+      const string FILE_NAME_GRAPHICS = "Local\\acpmf_graphics";
+      const string FILE_NAME_PHYSICS  = "Local\\acpmf_physics";
+      const string FILE_NAME_STATIC   = "Local\\acpmf_static";
+
       public static void Main(string[] args) {
-         string file_name = "Local\\acpmf_static";
-         BufferReadWrite static_buffer;
+         BufferReadWrite data_buffer;
+         string file_name = FILE_NAME_STATIC;
 
          try {
-            Console.WriteLine("Start to read static:");
-            static_buffer = new BufferReadWrite(name: file_name);
+            Console.WriteLine("\n\nStart to read static:");
+            data_buffer = new BufferReadWrite(name: file_name);
          }
-         catch(System.UnauthorizedAccessException e){
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Unable to open '{0}', access denied.", file_name, e);
-            Console.ForegroundColor = ConsoleColor.White;
+         catch(System.UnauthorizedAccessException) {
+            CustomPrintError(string.Format("Unable to open '{0}', access denied.", file_name));
+            return;
+         }
+         catch(System.IO.FileNotFoundException) {
+            CustomPrintError(string.Format("Couldn't find file {0}, is ACC running?"));
             return;
          }
 
          while(true){
             SPageFileStatic read_data;
-            static_buffer.Read<SPageFileStatic>(out read_data);
+            data_buffer.Read<SPageFileStatic>(out read_data);
             Console.Write(read_data);
             Thread.Sleep(250);
          }
@@ -151,6 +165,12 @@ namespace Program {
             Thread.Sleep(250);
          }
          */
+      }
+
+      public static void CustomPrintError(string message) {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleColor.White;
       }
    }
 }
