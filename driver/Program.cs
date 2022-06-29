@@ -138,7 +138,7 @@ namespace Driver {
          string file_name = FILE_NAME_STATIC;
 
          try {
-            Console.WriteLine("\n\nStart to read static:");
+            Console.WriteLine("Start to read file '{0}'", file_name);
             data_buffer = new BufferReadWrite(name: file_name);
          }
          catch(System.UnauthorizedAccessException) {
@@ -146,7 +146,7 @@ namespace Driver {
             return;
          }
          catch(System.IO.FileNotFoundException) {
-            CustomPrintError(string.Format("Couldn't find file {0}, is ACC running?"));
+            CustomPrintError(string.Format("Couldn't find file {0}, is ACC running?", file_name));
             return;
          }
 
