@@ -59,13 +59,8 @@ namespace Driver {
             for (int buffer_position = 0; buffer_position < buffer_size; buffer_position++){
                buffer.Read<int>(out read_data, buffer_position);
 
-<<<<<<< HEAD
                Console.Write("{0}\r", read_data);
             }
-=======
-            Console.Write($"{read_data}\r");
-            Thread.Sleep(250);
->>>>>>> c3b3c516c6d0a338c9caaf649e1b9174001e1a41
          }
       }
    }
