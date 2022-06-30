@@ -1,6 +1,5 @@
 ﻿using AcpmfData;
 using SharedMemory;
-using System;
 
 namespace Driver {
    class TelemetryParser {
@@ -9,30 +8,30 @@ namespace Driver {
       const string FILE_NAME_STATIC   = "Local\\acpmf_static";
 
       public static int Main(string[] args) {
-         string file_name = FILE_NAME_STATIC;
+         string file_name = FILE_NAME_PHYSICS;
          BufferReadWrite data_buffer = OpenBuffer(file_name);
 
          //ReadStaticTelemetry(data_buffer);
          ReadBufferWithInt(data_buffer);
 
-         return 0;
+         return 0x0;
       }
 
       static BufferReadWrite OpenBuffer(string file_name) {
          BufferReadWrite data_buffer;
 
          try {
-            Console.WriteLine("Start to read file '{0}'", file_name);
+            Console.WriteLine($"Start to read file '{file_name}'");
             data_buffer = new BufferReadWrite(name: file_name);
 
             return data_buffer;
          }
          catch(System.UnauthorizedAccessException) {
-            CustomPrintError(string.Format("Unable to open '{0}', access denied.", file_name));
+            CustomPrintError(string.Format($"Unable to open '{file_name}', access denied."));
             throw;
          }
          catch(System.IO.FileNotFoundException) {
-            CustomPrintError(string.Format("Couldn't find file '{0}', is ACC running?", file_name));
+            CustomPrintError(string.Format($"Couldn't find file '{file_name}', is ACC running?"));
             throw;
          }
       }
@@ -60,8 +59,13 @@ namespace Driver {
             for (int buffer_position = 0; buffer_position < buffer_size; buffer_position++){
                buffer.Read<int>(out read_data, buffer_position);
 
+<<<<<<< HEAD
                Console.Write("{0}\r", read_data);
             }
+=======
+            Console.Write($"{read_data}\r");
+            Thread.Sleep(250);
+>>>>>>> c3b3c516c6d0a338c9caaf649e1b9174001e1a41
          }
       }
    }
