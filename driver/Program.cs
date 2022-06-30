@@ -11,8 +11,7 @@ namespace Driver {
          string file_name = FILE_NAME_PHYSICS;
          BufferReadWrite data_buffer = OpenBuffer(file_name);
 
-         //ReadStaticTelemetry(data_buffer);
-         ReadBufferWithInt(data_buffer);
+         ReadStaticTelemetry(data_buffer);
 
          return 0x0;
       }
