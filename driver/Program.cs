@@ -12,7 +12,8 @@ namespace Driver {
          string file_name = FILE_NAME_STATIC;
          BufferReadWrite data_buffer = OpenBuffer(file_name);
 
-         ReadStaticTelemetry(data_buffer);
+         //ReadStaticTelemetry(data_buffer);
+         ReadBufferWithInt(data_buffer);
 
          return 0;
       }
@@ -55,10 +56,12 @@ namespace Driver {
       static void ReadBufferWithInt(BufferReadWrite buffer) {
          while(true){
             int read_data;
-            buffer.Read<int>(out read_data);
+            long buffer_size = buffer.BufferSize;
+            for (int buffer_position = 0; buffer_position < buffer_size; buffer_position++){
+               buffer.Read<int>(out read_data, buffer_position);
 
-            Console.Write("{0}\r", read_data);
-            Thread.Sleep(250);
+               Console.Write("{0}\r", read_data);
+            }
          }
       }
    }
