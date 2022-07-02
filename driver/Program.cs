@@ -1,5 +1,6 @@
 ﻿using AcpmfData;
 using SharedMemory;
+using System.Runtime.InteropServices;
 
 namespace Driver {
    class TelemetryParser {
@@ -7,6 +8,7 @@ namespace Driver {
       const string FILE_NAME_PHYSICS  = "Local\\acpmf_physics";
       const string FILE_NAME_STATIC   = "Local\\acpmf_static";
 
+      /*
       public static int Main(string[] args) {
          string file_name = FILE_NAME_PHYSICS;
          BufferReadWrite data_buffer = OpenBuffer(file_name);
@@ -17,6 +19,25 @@ namespace Driver {
 
          return 0x0;
       }
+      */
+
+      public static int Main(string[] args) {
+         InitPhysics();
+         SPageFilePhysics physics_struct = FillPhysics();
+         Console.WriteLine(physics_struct);
+         Console.WriteLine("Did it work?");
+         Console.ReadKey();
+
+         while(true){
+            Console.Clear();
+            PrintPhysics();
+            Thread.Sleep(16);
+         }
+         
+         return 0;
+      }
+
+
 
       static BufferReadWrite OpenBuffer(string file_name) {
          BufferReadWrite data_buffer;
@@ -75,5 +96,23 @@ namespace Driver {
             }
          }
       }
+
+#region DllImports
+      [DllImport(".\\acc_telemetry.dll", EntryPoint="set_up_number")]
+      static extern void SetUpNumber();
+
+      [DllImport(".\\acc_telemetry.dll", EntryPoint="get_test_number")]
+      static extern int GetTestNumber();
+
+      [DllImport(".\\acc_telemetry.dll", EntryPoint="init_physics")]
+      static extern void InitPhysics();
+
+      [DllImport(".\\acc_telemetry.dll", EntryPoint="print_physics")]
+      static extern void PrintPhysics();
+
+      [DllImport(".\\acc_telemetry.dll", EntryPoint="fill_physics")]
+      static extern SPageFilePhysics FillPhysics();
+
+#endregion
    }
 }

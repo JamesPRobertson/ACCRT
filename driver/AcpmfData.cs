@@ -1,6 +1,8 @@
 // Disable warning about unused variables for development
 #pragma warning disable CS0414
 
+using System.Runtime.InteropServices;
+
 namespace AcpmfData {
    struct SPageFileGraphic {
       int packetId = 0;
@@ -63,6 +65,7 @@ namespace AcpmfData {
    };
 
 
+   [StructLayout(LayoutKind.Sequential)]
    struct SPageFilePhysics {
       int packetId = 0;
       float gas = 0;
