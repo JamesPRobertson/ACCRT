@@ -11,7 +11,9 @@ namespace Driver {
          string file_name = FILE_NAME_PHYSICS;
          BufferReadWrite data_buffer = OpenBuffer(file_name);
 
-         ReadStaticTelemetry(data_buffer);
+         //ReadStaticTelemetry(data_buffer);
+         //ReadBufferWithInt(data_buffer);
+         ReadPhysicsTelemtry(data_buffer);
 
          return 0x0;
       }
@@ -51,6 +53,17 @@ namespace Driver {
          }
       }
 
+      static void ReadPhysicsTelemtry(BufferReadWrite buffer) {
+         while(true){
+            SPageFilePhysics read_data;
+            buffer.Read<SPageFilePhysics>(out read_data);
+
+            Console.Write(read_data);
+            Console.WriteLine("--------------------------------");
+            Thread.Sleep(250);
+         }
+      }
+
       static void ReadBufferWithInt(BufferReadWrite buffer) {
          while(true){
             int read_data;
@@ -58,7 +71,7 @@ namespace Driver {
             for (int buffer_position = 0; buffer_position < buffer_size; buffer_position++){
                buffer.Read<int>(out read_data, buffer_position);
 
-               Console.Write("{0}\r", read_data);
+               Console.Write($"{read_data}\r");
             }
          }
       }
