@@ -1,19 +1,162 @@
-#include "stdafx.h"
+#undef UNICODE
+
+#define WIN32_LEAN_AND_MEAN
+
+// ConsoleApplication1.cpp : Defines the entry point for the console application.
+//
+
+#include <winsock2.h>
 #include <windows.h>
+#include "stdafx.h"
 #include <tchar.h>
 #include <iostream>
 #include "SharedFileOut.h"
 #pragma optimize("",off)
-using namespace std;
+//using namespace std;
+
+
+#include <ws2tcpip.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+// Need to link with Ws2_32.lib
+#pragma comment (lib, "Ws2_32.lib")
+// #pragma comment (lib, "Mswsock.lib")
+
+#define DEFAULT_BUFLEN 512
+#define DEFAULT_PORT "27015"
+
+int __cdecl main(void)
+{
+    WSADATA wsaData;
+    int iResult;
+
+    SOCKET ListenSocket = INVALID_SOCKET;
+    SOCKET ClientSocket = INVALID_SOCKET;
+
+    struct addrinfo* result = NULL;
+    struct addrinfo hints;
+
+    int iSendResult;
+    char recvbuf[DEFAULT_BUFLEN];
+    int recvbuflen = DEFAULT_BUFLEN;
+
+    // Initialize Winsock
+    iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0) {
+        printf("WSAStartup failed with error: %d\n", iResult);
+        return 1;
+    }
+
+    ZeroMemory(&hints, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+    hints.ai_flags = AI_PASSIVE;
+
+    // Resolve the server address and port
+    iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+    if (iResult != 0) {
+        printf("getaddrinfo failed with error: %d\n", iResult);
+        WSACleanup();
+        return 1;
+    }
+
+    // Create a SOCKET for connecting to server
+    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (ListenSocket == INVALID_SOCKET) {
+        printf("socket failed with error: %ld\n", WSAGetLastError());
+        freeaddrinfo(result);
+        WSACleanup();
+        return 1;
+    }
+
+    // Setup the TCP listening socket
+    iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+    if (iResult == SOCKET_ERROR) {
+        printf("bind failed with error: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        closesocket(ListenSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    freeaddrinfo(result);
+
+    iResult = listen(ListenSocket, SOMAXCONN);
+    if (iResult == SOCKET_ERROR) {
+        printf("listen failed with error: %d\n", WSAGetLastError());
+        closesocket(ListenSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    // Accept a client socket
+    ClientSocket = accept(ListenSocket, NULL, NULL);
+    if (ClientSocket == INVALID_SOCKET) {
+        printf("accept failed with error: %d\n", WSAGetLastError());
+        closesocket(ListenSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    // No longer need server socket
+    closesocket(ListenSocket);
+
+    // Receive until the peer shuts down the connection
+    do {
+
+        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+        if (iResult > 0) {
+            printf("Bytes received: %d\n", iResult);
+
+            // Echo the buffer back to the sender
+            iSendResult = send(ClientSocket, recvbuf, iResult, 0);
+            if (iSendResult == SOCKET_ERROR) {
+                printf("send failed with error: %d\n", WSAGetLastError());
+                closesocket(ClientSocket);
+                WSACleanup();
+                return 1;
+            }
+            printf("Bytes sent: %d\n", iSendResult);
+        }
+        else if (iResult == 0)
+            printf("Connection closing...\n");
+        else {
+            printf("recv failed with error: %d\n", WSAGetLastError());
+            closesocket(ClientSocket);
+            WSACleanup();
+            return 1;
+        }
+
+    } while (iResult > 0);
+
+    // shutdown the connection since we're done
+    iResult = shutdown(ClientSocket, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        printf("shutdown failed with error: %d\n", WSAGetLastError());
+        closesocket(ClientSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    // cleanup
+    closesocket(ClientSocket);
+    WSACleanup();
+
+    return 0;
+}
 
 
 template <typename T, unsigned S>
-inline unsigned arraysize(const T(&v)[S]) {
+inline unsigned arraysize(const T(&v)[S])
+{
     return S;
 }
 
 
-struct SMElement {
+struct SMElement
+{
     HANDLE hMapFile;
     unsigned char* mapFileBuffer;
 };
@@ -22,179 +165,195 @@ SMElement m_graphics;
 SMElement m_physics;
 SMElement m_static;
 
-void init_physics() {
+void initPhysics()
+{
     TCHAR szName[] = TEXT("Local\\acpmf_physics");
     m_physics.hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SPageFilePhysics), szName);
-    if (!m_physics.hMapFile) {
+    if (!m_physics.hMapFile)
+    {
         MessageBoxA(GetActiveWindow(), "CreateFileMapping failed", "ACCS", MB_OK);
     }
     m_physics.mapFileBuffer = (unsigned char*)MapViewOfFile(m_physics.hMapFile, FILE_MAP_READ, 0, 0, sizeof(SPageFilePhysics));
-    if (!m_physics.mapFileBuffer) {
+    if (!m_physics.mapFileBuffer)
+    {
         MessageBoxA(GetActiveWindow(), "MapViewOfFile failed", "ACCS", MB_OK);
     }
 }
 
-void init_graphics() {
+void initGraphics()
+{
     TCHAR szName[] = TEXT("Local\\acpmf_graphics");
     m_graphics.hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SPageFileGraphic), szName);
-    if (!m_graphics.hMapFile) {
+    if (!m_graphics.hMapFile)
+    {
         MessageBoxA(GetActiveWindow(), "CreateFileMapping failed", "ACCS", MB_OK);
     }
     m_graphics.mapFileBuffer = (unsigned char*)MapViewOfFile(m_graphics.hMapFile, FILE_MAP_READ, 0, 0, sizeof(SPageFileGraphic));
-    if (!m_graphics.mapFileBuffer) {
+    if (!m_graphics.mapFileBuffer)
+    {
         MessageBoxA(GetActiveWindow(), "MapViewOfFile failed", "ACCS", MB_OK);
     }
 }
 
-void init_static() {
+void initStatic()
+{
     TCHAR szName[] = TEXT("Local\\acpmf_static");
     m_static.hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SPageFileStatic), szName);
-    if (!m_static.hMapFile) {
+    if (!m_static.hMapFile)
+    {
         MessageBoxA(GetActiveWindow(), "CreateFileMapping failed", "ACCS", MB_OK);
     }
     m_static.mapFileBuffer = (unsigned char*)MapViewOfFile(m_static.hMapFile, FILE_MAP_READ, 0, 0, sizeof(SPageFileStatic));
-    if (!m_static.mapFileBuffer) {
+    if (!m_static.mapFileBuffer)
+    {
         MessageBoxA(GetActiveWindow(), "MapViewOfFile failed", "ACCS", MB_OK);
     }
 }
 
-void dismiss(SMElement element) {
+void dismiss(SMElement element)
+{
     UnmapViewOfFile(element.mapFileBuffer);
     CloseHandle(element.hMapFile);
 }
 
-void print_data(string name, float value) {
-    wcout << name.c_str() << " : " << value << endl;
+void printData(std::string name, float value)
+{
+    std::wcout << name.c_str() << " : " << value << std::endl;
 }
 
 template <typename T, unsigned S>
-inline void print_data(const string name, const T(&v)[S]) {
-    wcout << name.c_str() << " : ";
-    
+inline void printData(const std::string name, const T(&v)[S])
+{
+    std::wcout << name.c_str() << " : ";
+
     for (int i = 0; i < S; i++)
     {
-        wcout << v[i];
+        std::wcout << v[i];
         if (i < S - 1)
         {
-            wcout << " , ";
+            std::wcout << " , ";
         }
 
     }
-    wcout << endl;
+    std::wcout << std::endl;
 }
 
 template <typename T, unsigned S, unsigned S2>
-inline void print_vector_data(const string name, const T(&v)[S][S2]) {
-    wcout << name.c_str() << " : ";
+inline void printData2(const std::string name, const T(&v)[S][S2])
+{
+    std::wcout << name.c_str() << " : ";
 
     for (int i = 0; i < S; i++)
     {
-        wcout << i << " : ";
+        std::wcout << i << " : ";
         for (int j = 0; j < S2; j++) {
-            wcout << v[i][j];
+            std::wcout << v[i][j];
             if (j < S2 - 1)
             {
-                wcout << " , ";
+                std::wcout << " , ";
             }
         }
 
-        wcout << ";" << endl;
-       
+        std::wcout << ";" << std::endl;
+
     }
 
 }
 
-int _tmain(int argc, _TCHAR* argv[]) {
-    init_physics();
-    init_graphics();
-    init_static();
+int _tmain(int argc, _TCHAR* argv[])
+{
+    initPhysics();
+    initGraphics();
+    initStatic();
 
-    wcout << "Press 1 for physics, 2 for graphics, 3 for static" << endl;
+    std::wcout << "Press 1 for physics, 2 for graphics, 3 for static" << std::endl;
 
-    while (true) {
-        // User presses 1
-        if (GetAsyncKeyState(0x31) != 0) {
-            wcout << "---------------PHYSICS INFO---------------" << endl;
+    while (true)
+    {
+        if (GetAsyncKeyState(0x31) != 0) // user pressed 1
+        {
+            std::wcout << "---------------PHYSICS INFO---------------" << std::endl;
             SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-            print_data("acc G", pf->accG);
-            print_data("brake", pf->brake);
-            print_data("camber rad", pf->camberRAD);
-            print_data("damage", pf->carDamage);
-            print_data("car height", pf->cgHeight);
-            print_data("drs", pf->drs);
-            print_data("tc", pf->tc);
-            print_data("fuel", pf->fuel);
-            print_data("gas", pf->gas);
-            print_data("gear", pf->gear);
-            print_data("number of tyres out", pf->numberOfTyresOut);
-            print_data("packet id", pf->packetId);
-            print_data("heading", pf->heading);
-            print_data("pitch", pf->pitch);
-            print_data("roll", pf->roll);
-            print_data("rpms", pf->rpms);
-            print_data("speed kmh", pf->speedKmh);
-            print_vector_data("contact point", pf->tyreContactPoint);
-            print_vector_data("contact normal", pf->tyreContactNormal);
-            print_vector_data("contact heading", pf->tyreContactHeading);
-            print_data("steer ", pf->steerAngle);
-            print_data("suspension travel", pf->suspensionTravel);
-            print_data("tyre core temp", pf->tyreCoreTemperature);
-            print_data("tyre dirty level", pf->tyreDirtyLevel);
-            print_data("tyre wear", pf->tyreWear);
-            print_data("velocity", pf->velocity);
-            print_data("wheel angular speed", pf->wheelAngularSpeed);
-            print_data("wheel load", pf->wheelLoad);
-            print_data("wheel slip", pf->wheelSlip);
-            print_data("wheel pressure", pf->wheelsPressure);
+            printData("acc G", pf->accG);
+            printData("brake", pf->brake);
+            printData("camber rad", pf->camberRAD);
+            printData("damage", pf->carDamage);
+            printData("car height", pf->cgHeight);
+            printData("drs", pf->drs);
+            printData("tc", pf->tc);
+            printData("fuel", pf->fuel);
+            printData("gas", pf->gas);
+            printData("gear", pf->gear);
+            printData("number of tyres out", pf->numberOfTyresOut);
+            printData("packet id", pf->packetId);
+            printData("heading", pf->heading);
+            printData("pitch", pf->pitch);
+            printData("roll", pf->roll);
+            printData("rpms", pf->rpms);
+            printData("speed kmh", pf->speedKmh);
+            printData2("contact point", pf->tyreContactPoint);
+            printData2("contact normal", pf->tyreContactNormal);
+            printData2("contact heading", pf->tyreContactHeading);
+            printData("steer ", pf->steerAngle);
+            printData("suspension travel", pf->suspensionTravel);
+            printData("tyre core temp", pf->tyreCoreTemperature);
+            printData("tyre dirty level", pf->tyreDirtyLevel);
+            printData("tyre wear", pf->tyreWear);
+            printData("velocity", pf->velocity);
+            printData("wheel angular speed", pf->wheelAngularSpeed);
+            printData("wheel load", pf->wheelLoad);
+            printData("wheel slip", pf->wheelSlip);
+            printData("wheel pressure", pf->wheelsPressure);
         }
 
-        // User presses 2
-        if (GetAsyncKeyState(0x32) != 0) {
-            wcout << "---------------GRAPHICS INFO---------------" << endl;
+        if (GetAsyncKeyState(0x32) != 0) // user pressed 2
+        {
+            std::wcout << "---------------GRAPHICS INFO---------------" << std::endl;
             SPageFileGraphic* pf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-            print_data("packetID ", pf->packetId);
-            print_data("STATUS ", pf->status);
-            print_data("session", pf->session);
-            print_data("completed laps", pf->completedLaps);
-            print_data("position", pf->position);
-            print_data("current time s", pf->currentTime);
-            print_data("current time", pf->iCurrentTime);
-            print_data("last time s", pf->lastTime);
-            print_data("last time ", pf->iLastTime);
-            print_data("best time s", pf->bestTime);
-            print_data("best time", pf->iBestTime);
-            print_data("sessionTimeLeft", pf->sessionTimeLeft);
-            print_data("distanceTraveled", pf->distanceTraveled);
-            print_data("isInPit", pf->isInPit);
-            print_data("currentSectorIndex", pf->currentSectorIndex);
-            print_data("lastSectorTime", pf->lastSectorTime);
-            print_data("numberOfLaps", pf->numberOfLaps);
-            wcout << "TYRE COMPOUND : " << pf->tyreCompound << endl;
-            print_data("replayMult", pf->replayTimeMultiplier);
-            print_data("normalizedCarPosition", pf->normalizedCarPosition);
-            print_vector_data("carCoordinates", pf->carCoordinates);
+            printData("packetID ", pf->packetId);
+            printData("STATUS ", pf->status);
+            printData("session", pf->session);
+            printData("completed laps", pf->completedLaps);
+            printData("position", pf->position);
+            printData("current time s", pf->currentTime);
+            printData("current time", pf->iCurrentTime);
+            printData("last time s", pf->lastTime);
+            printData("last time ", pf->iLastTime);
+            printData("best time s", pf->bestTime);
+            printData("best time", pf->iBestTime);
+            printData("sessionTimeLeft", pf->sessionTimeLeft);
+            printData("distanceTraveled", pf->distanceTraveled);
+            printData("isInPit", pf->isInPit);
+            printData("currentSectorIndex", pf->currentSectorIndex);
+            printData("lastSectorTime", pf->lastSectorTime);
+            printData("numberOfLaps", pf->numberOfLaps);
+            std::wcout << "TYRE COMPOUND : " << pf->tyreCompound << std::endl;
+            printData("replayMult", pf->replayTimeMultiplier);
+            printData("normalizedCarPosition", pf->normalizedCarPosition);
+            printData2("carCoordinates", pf->carCoordinates);
         }
 
-        // User presses 3
-        if (GetAsyncKeyState(0x33) != 0) {
-            wcout << "---------------STATIC INFO---------------" << endl;
+
+        if (GetAsyncKeyState(0x33) != 0) // user pressed 3
+        {
+            std::wcout << "---------------STATIC INFO---------------" << std::endl;
             SPageFileStatic* pf = (SPageFileStatic*)m_static.mapFileBuffer;
-            wcout << "SM VERSION " << pf->smVersion << endl;
-            wcout << "AC VERSION " << pf->acVersion << endl;
+            std::wcout << "SM VERSION " << pf->smVersion << std::endl;
+            std::wcout << "AC VERSION " << pf->acVersion << std::endl;
 
-            print_data("number of sessions ", pf->numberOfSessions);
-            print_data("numCars", pf->numCars);
-            wcout << "Car model " << pf->carModel << endl;
-            wcout << "Car track " << pf->track << endl;
-            wcout << "Player Name " << pf->playerName << endl;
-            print_data("sectorCount", pf->sectorCount);
+            printData("number of sessions ", pf->numberOfSessions);
+            printData("numCars", pf->numCars);
+            std::wcout << "Car model " << pf->carModel << std::endl;
+            std::wcout << "Car track " << pf->track << std::endl;
+            std::wcout << "Player Name " << pf->playerName << std::endl;
+            printData("sectorCount", pf->sectorCount);
 
-            print_data("maxTorque", pf->maxTorque);
-            print_data("maxPower", pf->maxPower);
-            print_data("maxRpm", pf->maxRpm);
-            print_data("maxFuel", pf->maxFuel);
-            print_data("suspensionMaxTravel", pf->suspensionMaxTravel);
-            print_data("tyreRadius", pf->tyreRadius);
+            printData("maxTorque", pf->maxTorque);
+            printData("maxPower", pf->maxPower);
+            printData("maxRpm", pf->maxRpm);
+            printData("maxFuel", pf->maxFuel);
+            printData("suspensionMaxTravel", pf->suspensionMaxTravel);
+            printData("tyreRadius", pf->tyreRadius);
 
         }
     }
@@ -205,3 +364,5 @@ int _tmain(int argc, _TCHAR* argv[]) {
 
     return 0;
 }
+
+
