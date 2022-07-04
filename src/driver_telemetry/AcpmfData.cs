@@ -4,236 +4,238 @@
 using System.Runtime.InteropServices;
 
 namespace AcpmfData {
-   struct SPageFileGraphics {
-      int packetId;
-      int status;
-      int session;
-      IntPtr currentTime;
-      IntPtr lastTime;
-      IntPtr bestTime;
-      IntPtr split;
-      int completedLaps;
-      int position;
-      int iCurrentTime;
-      int iLastTime;
-      int iBestTime;
-      float sessionTimeLeft;
-      float distanceTraveled;
-      int isInPit;
-      int currentSectorIndex;
-      int lastSectorTime;
-      int numberOfLaps;
-      IntPtr tyreCompound;
-      float replayTimeMultiplier;
-      float normalizedCarPosition;
+   public struct SPageFileGraphics {
+      public int packetId;
+      public int status;
+      public int session;
+      public IntPtr currentTime;
+      public IntPtr lastTime;
+      public IntPtr bestTime;
+      public IntPtr split;
+      public int completedLaps;
+      public int position;
+      public int iCurrentTime;
+      public int iLastTime;
+      public int iBestTime;
+      public float sessionTimeLeft;
+      public float distanceTraveled;
+      public int isInPit;
+      public int currentSectorIndex;
+      public int lastSectorTime;
+      public int numberOfLaps;
+      public IntPtr tyreCompound;
+      public float replayTimeMultiplier;
+      public float normalizedCarPosition;
 
-      int activeCars;
-      //float carCoordinates[60][3];
-      //int carID[60];
-      int playerCarID;
-      float penaltyTime;
-      int flag;
+      public int activeCars;
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 60 * 3)]
+      public float[] carCoordinates;
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 60)]
+      public int[] carID;
+      public int playerCarID;
+      public float penaltyTime;
+      public int flag;
       //PenaltyShortcut penalty = PenaltyShortcut::None;
-      int idealLineOn;
-      int isInPitLane;
+      public int idealLineOn;
+      public int isInPitLane;
 
-      float surfaceGrip;
-      int mandatoryPitDone;
+      public float surfaceGrip;
+      public int mandatoryPitDone;
 
-      float windSpeed;
-      float windDirection;
+      public float windSpeed;
+      public float windDirection;
 
-      int isSetupMenuVisible;
+      public int isSetupMenuVisible;
 
-      int mainDisplayIndex;
-      int secondaryDisplayIndex;
-      int TC;
-      int TCCut;
-      int EngineMap;
-      int ABS;
-      int fuelXLap;
-      int rainLights;
-      int flashingLights;
-      int lightsStage;
-      float exhaustTemperature;
-      int wiperLV;
-      int DriverStintTotalTimeLeft;
-      int DriverStintTimeLeft;
-      int rainTyres;
+      public int mainDisplayIndex;
+      public int secondaryDisplayIndex;
+      public int TC;
+      public int TCCut;
+      public int EngineMap;
+      public int ABS;
+      public int fuelXLap;
+      public int rainLights;
+      public int flashingLights;
+      public int lightsStage;
+      public float exhaustTemperature;
+      public int wiperLV;
+      public int DriverStintTotalTimeLeft;
+      public int DriverStintTimeLeft;
+      public int rainTyres;
    };
 
    //[StructLayout(LayoutKind.Sequential)]
    public struct SPageFilePhysics {
-      int packetId;
-      float gas;
+      public int packetId;
+      public float gas;
       public float brake;
       public float fuel;
       public int gear;
-      int rpms;
-      float steerAngle;
-      float speedKmh;    
+      public int rpms;
+      public float steerAngle;
+      public float speedKmh;    
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
       public float[] velocity;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-      float[] accG;
+      public float[] accG;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] wheelSlip;
+      public float[] wheelSlip;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] wheelLoad;
+      public float[] wheelLoad;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] wheelsPressure;
+      public float[] wheelsPressure;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] wheelAngularSpeed;
+      public float[] wheelAngularSpeed;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] tyreWear;
+      public float[] tyreWear;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] tyreDirtyLevel;
+      public float[] tyreDirtyLevel;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] tyreCoreTemperature;
+      public float[] tyreCoreTemperature;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] camberRAD;
+      public float[] camberRAD;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] suspensionTravel;
-      float drs;
-      float tc;
-      float heading;
-      float pitch;
-      float roll;
-      float cgHeight;
+      public float[] suspensionTravel;
+      public float drs;
+      public float tc;
+      public float heading;
+      public float pitch;
+      public float roll;
+      public float cgHeight;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 5)]
-      float[] carDamage;
-      int numberOfTyresOut;
-      int pitLimiterOn;
-      float abs;
-      float kersCharge;
-      float kersInput;
-      int autoShifterOn;
+      public float[] carDamage;
+      public int numberOfTyresOut;
+      public int pitLimiterOn;
+      public float abs;
+      public float kersCharge;
+      public float kersInput;
+      public int autoShifterOn;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-      float[] rideHeight;
-      float turboBoost;
-      float ballast;
-      float airDensity;
-      float airTemp;
-      float roadTemp;
+      public float[] rideHeight;
+      public float turboBoost;
+      public float ballast;
+      public float airDensity;
+      public float airTemp;
+      public float roadTemp;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-      float[] localAngularVel;
-      float finalFF;
-      float performanceMeter;
+      public float[] localAngularVel;
+      public float finalFF;
+      public float performanceMeter;
 
-      int engineBrake;
-      int ersRecoveryLevel;
-      int ersPowerLevel;
-      int ersHeatCharging;
-      int ersIsCharging;
-      float kersCurrentKJ;
+      public int engineBrake;
+      public int ersRecoveryLevel;
+      public int ersPowerLevel;
+      public int ersHeatCharging;
+      public int ersIsCharging;
+      public float kersCurrentKJ;
 
-      int drsAvailable;
-      int drsEnabled;
-
-      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] brakeTemp;
-      float clutch;
+      public int drsAvailable;
+      public int drsEnabled;
 
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] tyreTempI;
-      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] tyreTempM;
-      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] tyreTempO;
-
-      int isAIControlled;
-
-      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)]
-      float[] tyreContactPoint;
-      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)]
-      float[] tyreContactNormal;
-      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)]
-      float[] tyreContactHeading;
-
-      float brakeBias;
-
-      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)]
-      float[] localVelocity;
-
-      int P2PActivations;
-      int P2PStatus;
-
-      int currentMaxRpm;
+      public float[] brakeTemp;
+      public float clutch;
 
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] mz;
+      public float[] tyreTempI;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] fx;
+      public float[] tyreTempM;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] fy;
+      public float[] tyreTempO;
+
+      public int isAIControlled;
+
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4 * 3)]
+      public float[] tyreContactPoint;
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4 * 3)]
+      public float[] tyreContactNormal;
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4 * 3)]
+      public float[] tyreContactHeading;
+
+      public float brakeBias;
+
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+      public float[] localVelocity;
+
+      public int P2PActivations;
+      public int P2PStatus;
+
+      public int currentMaxRpm;
+
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] slipRatio;
+      public float[] mz;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] slipAngle;
+      public float[] fx;
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+      public float[] fy;
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+      public float[] slipRatio;
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+      public float[] slipAngle;
 
 
-      int tcinAction;
-      int absInAction;
+      public int tcinAction;
+      public int absInAction;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] suspensionDamage;
+      public float[] suspensionDamage;
       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-      float[] tyreTemp;
+      public float[] tyreTemp;
    };
 
-   struct SPageFileStatic {
-      IntPtr smVersion;
-      IntPtr acVersion;
+   public struct SPageFileStatic {
+      public IntPtr smVersion;
+      public IntPtr acVersion;
 
       // session static info
-      int numberOfSessions;
-      int numCars;
-      IntPtr carModel;
-      IntPtr track;
-      IntPtr playerName;
-      IntPtr playerSurname;
-      IntPtr playerNick;
-      int sectorCount;
+      public int numberOfSessions;
+      public int numCars;
+      public IntPtr carModel;
+      public IntPtr track;
+      public IntPtr playerName;
+      public IntPtr playerSurname;
+      public IntPtr playerNick;
+      public int sectorCount;
 
       // car static info
-      float maxTorque;
-      float maxPower;
-      int	maxRpm;
-      float maxFuelf;
-      float suspensionMaxTravelf;
-      float tyreRadiusf;
-      float maxTurboBoostf;
+      public float maxTorque;
+      public float maxPower;
+      public int	maxRpm;
+      public float maxFuelf;
+      public float suspensionMaxTravelf;
+      public float tyreRadiusf;
+      public float maxTurboBoostf;
 
-      float deprecated_1;
-      float deprecated_2;
+      public float deprecated_1;
+      public float deprecated_2;
 
-      int penaltiesEnabled;
+      public int penaltiesEnabled;
 
-      float aidFuelRatef;
-      float aidTireRatef;
-      float aidMechanicalDamagef;
-      int aidAllowTyreBlankets;
-      float aidStabilityf;
-      int aidAutoClutch;
-      int aidAutoBlip;
+      public float aidFuelRatef;
+      public float aidTireRatef;
+      public float aidMechanicalDamagef;
+      public int aidAllowTyreBlankets;
+      public float aidStabilityf;
+      public int aidAutoClutch;
+      public int aidAutoBlip;
 
-      int hasDRS;
-      int hasERS;
-      int hasKERS;
-      float kersMaxJf;
-      int engineBrakeSettingsCount;
-      int ersPowerControllerCount;
-      float trackSPlineLengthf;
-      IntPtr trackConfiguration;
-      float ersMaxJ;
+      public int hasDRS;
+      public int hasERS;
+      public int hasKERS;
+      public float kersMaxJf;
+      public int engineBrakeSettingsCount;
+      public int ersPowerControllerCount;
+      public float trackSPlineLengthf;
+      public IntPtr trackConfiguration;
+      public float ersMaxJ;
 
-      int isTimedRace;
-      int hasExtraLap;
+      public int isTimedRace;
+      public int hasExtraLap;
 
-      IntPtr carSkin;
-      int reversedGridPositions;
-      int PitWindowStart;
-      int PitWindowEnd;
-      int isOnline;
+      public IntPtr carSkin;
+      public int reversedGridPositions;
+      public int PitWindowStart;
+      public int PitWindowEnd;
+      public int isOnline;
    };
 }
 
