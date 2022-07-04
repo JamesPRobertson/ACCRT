@@ -22,22 +22,42 @@ namespace Driver {
       */
 
       public static int Main(string[] args) {
-         InitPhysics();
-         SPageFilePhysics physics_struct = FillPhysics();
-         Console.WriteLine(physics_struct);
-         Console.WriteLine("Did it work?");
-         Console.ReadKey();
+         SPageFilePhysics physics_struct = new SPageFilePhysics();
+         IntPtr ptr_physics_struct = Marshal.AllocHGlobal(Marshal.SizeOf(physics_struct));
+
+         SPageFileGraphics graphics_struct = new SPageFileGraphics();
+         IntPtr ptr_graphics_struct = Marshal.AllocHGlobal(Marshal.SizeOf(graphics_struct));
+
+         SPageFilePhysics static_struct = new SPageFilePhysics();
+         IntPtr ptr_static_struct = Marshal.AllocHGlobal(Marshal.SizeOf(static_struct));
 
          while(true){
+            UpdatePhysics(ptr_physics_struct);
+            physics_struct = Marshal.PtrToStructure<SPageFilePhysics>(ptr_physics_struct);
+
             Console.Clear();
-            PrintPhysics();
+
+            Console.WriteLine($"brake: {physics_struct.brake}");
+            Console.WriteLine($"gear:  {physics_struct.gear}");
+            Console.WriteLine($"fuel:  {physics_struct.fuel}");
             Thread.Sleep(16);
          }
-         
+
+         Marshal.FreeHGlobal(ptr_physics_struct);
+         ptr_physics_struct = IntPtr.Zero;
+
          return 0;
       }
 
+      static void PrintOutPhysics() {
+         while(true){
+            Console.Clear();
+            // PrintPhysics();
+            Thread.Sleep(16);
+         }
 
+         return;
+      }
 
       static BufferReadWrite OpenBuffer(string file_name) {
          BufferReadWrite data_buffer;
@@ -98,21 +118,14 @@ namespace Driver {
       }
 
 #region DllImports
-      [DllImport(".\\acc_telemetry.dll", EntryPoint="set_up_number")]
-      static extern void SetUpNumber();
+      [DllImport(".\\acc_telemetry.dll", EntryPoint="update_physics_struct")]
+      static extern void UpdatePhysics(IntPtr PhysicsData);
 
-      [DllImport(".\\acc_telemetry.dll", EntryPoint="get_test_number")]
-      static extern int GetTestNumber();
+      [DllImport(".\\acc_telemetry.dll", EntryPoint="update_graphics_struct")]
+      static extern void UpdateGraphics(IntPtr GraphicsData);
 
-      [DllImport(".\\acc_telemetry.dll", EntryPoint="init_physics")]
-      static extern void InitPhysics();
-
-      [DllImport(".\\acc_telemetry.dll", EntryPoint="print_physics")]
-      static extern void PrintPhysics();
-
-      [DllImport(".\\acc_telemetry.dll", EntryPoint="fill_physics")]
-      static extern SPageFilePhysics FillPhysics();
-
+      [DllImport(".\\acc_telemetry.dll", EntryPoint="update_static_struct")]
+      static extern void UpdateStatic(IntPtr StaticData);
 #endregion
    }
 }
