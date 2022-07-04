@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32611.2
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "driver_telemetry", "driver_telemetry.csproj", "{9A19103F-16F7-4668-BE54-9A1E7A4F7556}"
+	ProjectSection(ProjectDependencies) = postProject
+		{84A8AA93-06C5-4384-93A4-931DE1966BC7} = {84A8AA93-06C5-4384-93A4-931DE1966BC7}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "acc_telemetry_dll", "acc_telemetry_dll_src\acc_telemetry_dll.vcxproj", "{84A8AA93-06C5-4384-93A4-931DE1966BC7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A19103F-16F7-4668-BE54-9A1E7A4F7556}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9A19103F-16F7-4668-BE54-9A1E7A4F7556}.Debug|x64.Build.0 = Debug|Any CPU
+		{9A19103F-16F7-4668-BE54-9A1E7A4F7556}.Release|x64.ActiveCfg = Release|Any CPU
+		{9A19103F-16F7-4668-BE54-9A1E7A4F7556}.Release|x64.Build.0 = Release|Any CPU
+		{84A8AA93-06C5-4384-93A4-931DE1966BC7}.Debug|x64.ActiveCfg = Debug|x64
+		{84A8AA93-06C5-4384-93A4-931DE1966BC7}.Debug|x64.Build.0 = Debug|x64
+		{84A8AA93-06C5-4384-93A4-931DE1966BC7}.Release|x64.ActiveCfg = Release|x64
+		{84A8AA93-06C5-4384-93A4-931DE1966BC7}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {43CD743D-0864-411F-803B-BAF888091BA8}
+	EndGlobalSection
+EndGlobal
