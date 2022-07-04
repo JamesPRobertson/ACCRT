@@ -5,14 +5,17 @@ param(
     [Switch] $release
 )
 
-$start_dir = "$PWD"
+$START_DIR = "$PWD"
 
-$config = ($release) ? "Release" : "Debug"
-$sln_dir = "$pwd\src\driver_telemetry"
-$output_dir = "$sln_dir\bin\$config\net6.0"
-$executable_name = "driver_telemetry.exe"
+$CONFIG = ($release) ? "Release" : "Debug"
+$SLN_DIR = "$pwd\src\driver_telemetry"
+$OUTPUT_DIR = "$SLN_DIR\bin\$CONFIG\net6.0"
+$EXECUTABLE_NAME = "driver_telemetry.exe"
 
-$msbuild_command = "msbuild /p:Configuration=$config"
+$BUILD_LOG_NAME = "latest_build.log"
+$BUILD_LOG_LOCATION = "$SLN_DIR\$BUILD_LOG_NAME"
+
+$MSBUILD_COMMAND = "msbuild /p:Configuration=$CONFIG"
 
 if ($Null -eq $env:VSINSTALLDIR) {
     Write-Host "Enabling Visual Studio Developer Powershell mode."
@@ -49,12 +52,19 @@ else {
 
 Write-Host "Starting Build"
 
-Set-Location $sln_dir
+Set-Location $SLN_DIR
 
-Invoke-Expression $msbuild_command
+Start-Transcript -Path $BUILD_LOG_LOCATION
+
+Invoke-Expression $MSBUILD_COMMAND
+$msbuild_exitcode = $LASTEXITCODE
+Stop-Transcript | Out-Null
 
 Set-Location $start_dir
 
-if ($LASTEXITCODE -eq 0) {
-    Invoke-Expression  "$output_dir\$executable_name"
+if ($msbuild_exitcode -eq 0) {
+    Invoke-Expression  "$OUTPUT_DIR\$EXECUTABLE_NAME"
+}
+else {
+    Write-Host "Build failed. Log located at $BUILD_LOG_LOCATION"
 }
