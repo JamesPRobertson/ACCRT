@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TelemetryDll.h"
+
 enum class PenaltyShortcut : int {
     None,
     DriveThrough_Cutting,
@@ -64,7 +66,7 @@ typedef int AC_FLAG_TYPE;
 #pragma pack(push)
 #pragma pack(4)
 
-struct SPageFilePhysics
+CPPWIN32DLL_EXPORTS struct SPageFilePhysics
 {
 
     int packetId = 0;
@@ -156,7 +158,7 @@ struct SPageFilePhysics
 };
 
 
-struct SPageFileGraphic
+CPPWIN32DLL_EXPORTS struct SPageFileGraphics
 {
     int packetId = 0;
     AC_STATUS status = AC_OFF;
@@ -217,7 +219,7 @@ struct SPageFileGraphic
 };
 
 
-struct SPageFileStatic
+CPPWIN32DLL_EXPORTS struct SPageFileStatic
 {
     wchar_t smVersion[15];
     wchar_t acVersion[15];
