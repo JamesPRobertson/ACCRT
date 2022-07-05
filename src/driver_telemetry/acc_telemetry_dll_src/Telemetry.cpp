@@ -64,27 +64,27 @@ void dismiss(SMElement element) {
     CloseHandle(element.hMapFile);
 }
 
-CPPWIN32DLL_EXPORTS void update_graphics_struct(OUT SPageFileGraphics* ptr_phys_struct) {
+CPPWIN32DLL_EXPORTS void update_graphics_struct(OUT SPageFileGraphics* ptr_phys_struct, size_t struct_size) {
     if (!m_graphics.mapFileBuffer) {
         init_graphics();
     }
 
-    memcpy(ptr_phys_struct, m_graphics.mapFileBuffer, sizeof(SPageFileGraphics));
+    memcpy(ptr_phys_struct, m_graphics.mapFileBuffer, struct_size);
 }
 
-CPPWIN32DLL_EXPORTS void update_physics_struct(OUT SPageFilePhysics* ptr_grph_struct) {
+CPPWIN32DLL_EXPORTS void update_physics_struct(OUT SPageFilePhysics* ptr_grph_struct, size_t struct_size) {
     if (!m_physics.mapFileBuffer) {
         init_physics();
     }
 
-    memcpy(ptr_grph_struct, m_physics.mapFileBuffer, sizeof(SPageFilePhysics));
+    memcpy(ptr_grph_struct, m_physics.mapFileBuffer, struct_size);
 }
 
-CPPWIN32DLL_EXPORTS void update_static_struct(OUT SPageFileStatic* ptr_stc_struct) {
+CPPWIN32DLL_EXPORTS void update_static_struct(OUT SPageFileStatic* ptr_stc_struct, size_t struct_size) {
     if (!m_static.mapFileBuffer) {
         init_static();
     }
 
-    memcpy(ptr_stc_struct, m_static.mapFileBuffer, sizeof(SPageFileStatic));
+    memcpy(ptr_stc_struct, m_static.mapFileBuffer, struct_size);
 }
 

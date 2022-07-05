@@ -29,19 +29,25 @@ namespace Driver {
             UpdateAllTelemetryStructs();
             Console.Clear();
 
-            Console.WriteLine($"Current Packet: {physics_info.packetId}\n");
+            Console.WriteLine($"Current Packet: {this.physics_info.packetId}\n");
             Console.WriteLine("Temperatures:");
-            Console.WriteLine($"   Air:     {physics_info.airTemp}");
-            Console.WriteLine($"   Track:   {physics_info.roadTemp}\n");
+            Console.WriteLine($"   Air:     {this.physics_info.airTemp}");
+            Console.WriteLine($"   Track:   {this.physics_info.roadTemp}\n");
             
-            Console.WriteLine($"gas:   {physics_info.gas}");
-            Console.WriteLine($"brake: {physics_info.brake}\n");
-            Console.WriteLine($"RPM:   {physics_info.rpms}");
-            Console.WriteLine($"gear:  {physics_info.gear}");
-            Console.WriteLine($"fuel:  {physics_info.fuel}\n");
+            Console.WriteLine($"Speed:      {this.physics_info.speedKmh:000.0} km/h");
+            Console.WriteLine($"throttle:   {this.physics_info.gas:0.00%}");
+            Console.WriteLine($"brake:      {this.physics_info.brake:0.00%}\n");
+            Console.WriteLine($"RPM:        {this.physics_info.rpms}");
+            Console.WriteLine($"gear:       {this.physics_info.gear}");
+            Console.WriteLine($"fuel:       {this.physics_info.fuel:0.00} L\n");
 
-            Console.WriteLine( "Velocities: ");
-            Console.WriteLine($"   Speed: {physics_info.speedKmh}");
+            Console.WriteLine("---------------------------------------------\n");
+            Console.WriteLine($"Lap Time:    {this.graphics_info.currentTime}");
+            Console.WriteLine($"Last Lap:    {this.graphics_info.lastTime}");
+            Console.WriteLine($"Best Lap:    {this.graphics_info.bestTime}\n");
+
+            Console.WriteLine($"Current Track:  {this.static_info.track}");
+
             Thread.Sleep(16);
          }
 
@@ -60,14 +66,14 @@ namespace Driver {
       }
 
       void UpdateAllTelemetryStructs() {
-            UpdatePhysics(this.ptr_physics);
-            this.physics_info = Marshal.PtrToStructure<SPageFilePhysics>(ptr_physics);
+            UpdatePhysics(this.ptr_physics, Marshal.SizeOf(physics_info));
+            this.physics_info = Marshal.PtrToStructure<SPageFilePhysics>(this.ptr_physics);
 
-            UpdateGraphics(this.ptr_graphics);
+            UpdateGraphics(this.ptr_graphics, Marshal.SizeOf(graphics_info));
             this.graphics_info = Marshal.PtrToStructure<SPageFileGraphics>(ptr_graphics);
 
-            UpdateStatic(this.ptr_static);
-            this.static_info = Marshal.PtrToStructure<SPageFileStatic>(ptr_static);
+            UpdateStatic(this.ptr_static, Marshal.SizeOf(static_info));
+            this.static_info = Marshal.PtrToStructure<SPageFileStatic>(this.ptr_static);
       }
       
       void CustomPrintError(string message) {
@@ -78,18 +84,19 @@ namespace Driver {
 
 #region DllImports
       [DllImport(".\\acc_telemetry.dll", EntryPoint="update_physics_struct")]
-      static extern void UpdatePhysics(IntPtr PhysicsData);
+      static extern void UpdatePhysics(IntPtr PhysicsData, int struct_size);
 
       [DllImport(".\\acc_telemetry.dll", EntryPoint="update_graphics_struct")]
-      static extern void UpdateGraphics(IntPtr GraphicsData);
+      static extern void UpdateGraphics(IntPtr GraphicsData, int struct_size);
 
       [DllImport(".\\acc_telemetry.dll", EntryPoint="update_static_struct")]
-      static extern void UpdateStatic(IntPtr StaticData);
+      static extern void UpdateStatic(IntPtr StaticData, int struct_size);
 #endregion
    }
 
    class CLI {
       public static void Main(string[] args) {
+         Console.WriteLine("Initializing...");
          TelemetryParser driver_telemetry = new TelemetryParser();
          driver_telemetry.main();
       }
