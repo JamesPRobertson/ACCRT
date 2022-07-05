@@ -245,8 +245,10 @@ namespace AcpmfData {
       public float maxPower;
       public int	maxRpm;
       public float maxFuelf;
-      public float suspensionMaxTravelf;
-      public float tyreRadiusf;
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+      public float[] suspensionMaxTravelf;
+      [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+      public float[] tyreRadiusf;
       public float maxTurboBoostf;
 
       public float deprecated_1;

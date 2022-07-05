@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 namespace Driver {
    class TelemetryParser {
       SPageFilePhysics  physics_info;
-      //SPageFileGraphics graphics_info;
+      SPageFileGraphics graphics_info;
       SPageFileStatic   static_info;
 
       IntPtr ptr_physics;
-      //IntPtr ptr_graphics;
+      IntPtr ptr_graphics;
       IntPtr ptr_static;
 
       public TelemetryParser() {
@@ -17,10 +17,10 @@ namespace Driver {
 
       ~TelemetryParser() {
          Marshal.FreeHGlobal(ptr_physics);
-         //Marshal.FreeHGlobal(ptr_graphics);
+         Marshal.FreeHGlobal(ptr_graphics);
          Marshal.FreeHGlobal(ptr_static);
          ptr_physics  = IntPtr.Zero;
-         //ptr_graphics = IntPtr.Zero;
+         ptr_graphics = IntPtr.Zero;
          ptr_static   = IntPtr.Zero;
       }
 
@@ -52,8 +52,8 @@ namespace Driver {
          this.physics_info = new SPageFilePhysics();
          this.ptr_physics = Marshal.AllocHGlobal(Marshal.SizeOf(physics_info));
 
-         //this.graphics_info = new SPageFileGraphics();
-         //this.ptr_graphics = Marshal.AllocHGlobal(Marshal.SizeOf(graphics_info));
+         this.graphics_info = new SPageFileGraphics();
+         this.ptr_graphics = Marshal.AllocHGlobal(Marshal.SizeOf(graphics_info));
 
          this.static_info = new SPageFileStatic();
          this.ptr_static = Marshal.AllocHGlobal(Marshal.SizeOf(static_info));
@@ -63,8 +63,8 @@ namespace Driver {
             UpdatePhysics(this.ptr_physics);
             this.physics_info = Marshal.PtrToStructure<SPageFilePhysics>(ptr_physics);
 
-            //UpdateGraphics(this.ptr_graphics);
-            //this.graphics_info = Marshal.PtrToStructure<SPageFileGraphics>(ptr_graphics);
+            UpdateGraphics(this.ptr_graphics);
+            this.graphics_info = Marshal.PtrToStructure<SPageFileGraphics>(ptr_graphics);
 
             UpdateStatic(this.ptr_static);
             this.static_info = Marshal.PtrToStructure<SPageFileStatic>(ptr_static);
