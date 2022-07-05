@@ -34,6 +34,7 @@ namespace AcpmfData {
       Disqualified_ExceededDriverStintLimit,
    };
 
+   [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
    public struct SPageFileGraphics {
       public int packetId;
       public int status;
@@ -99,7 +100,7 @@ namespace AcpmfData {
       public int rainTyres;
    };
 
-   //[StructLayout(LayoutKind.Sequential)]
+   [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
    public struct SPageFilePhysics {
       public int packetId;
       public float gas;
