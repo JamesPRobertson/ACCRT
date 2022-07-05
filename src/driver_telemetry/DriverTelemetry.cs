@@ -11,8 +11,10 @@ namespace Driver {
       IntPtr ptr_graphics;
       IntPtr ptr_static;
 
+      const string DLL_DATA_FILE = @".\acc_telemetry.dll";
+
       public TelemetryParser() {
-         InitializeTelemetryStructs();
+         InitializeTelemetry();
       }
 
       ~TelemetryParser() {
@@ -26,13 +28,13 @@ namespace Driver {
 
       public void main() {
          while(true){
-            UpdateAllTelemetryStructs();
+            UpdateAllTelemetrySources();
             Console.Clear();
 
             Console.WriteLine($"Current Packet: {this.physics_info.packetId}\n");
             Console.WriteLine("Temperatures:");
-            Console.WriteLine($"   Air:     {this.physics_info.airTemp}");
-            Console.WriteLine($"   Track:   {this.physics_info.roadTemp}\n");
+            Console.WriteLine($"   Air:     {this.physics_info.airTemp:00} c");
+            Console.WriteLine($"   Track:   {this.physics_info.roadTemp:00} c\n");
             
             Console.WriteLine($"Speed:      {this.physics_info.speedKmh:000.0} km/h");
             Console.WriteLine($"throttle:   {this.physics_info.gas:0.00%}");
@@ -42,9 +44,9 @@ namespace Driver {
             Console.WriteLine($"fuel:       {this.physics_info.fuel:0.00} L\n");
 
             Console.WriteLine("---------------------------------------------\n");
-            Console.WriteLine($"Lap Time:    {this.graphics_info.currentTime}");
-            Console.WriteLine($"Last Lap:    {this.graphics_info.lastTime}");
-            Console.WriteLine($"Best Lap:    {this.graphics_info.bestTime}\n");
+            Console.WriteLine($"Lap Time:   {this.graphics_info.currentTime}");
+            Console.WriteLine($"Last Lap:   {this.graphics_info.lastTime}");
+            Console.WriteLine($"Best Lap:   {this.graphics_info.bestTime}\n");
 
             Console.WriteLine($"Current Track:  {this.static_info.track}");
 
@@ -54,7 +56,7 @@ namespace Driver {
          return;
       }
 
-      void InitializeTelemetryStructs() {
+      void InitializeTelemetry() {
          this.physics_info = new SPageFilePhysics();
          this.ptr_physics = Marshal.AllocHGlobal(Marshal.SizeOf(physics_info));
 
@@ -65,14 +67,18 @@ namespace Driver {
          this.ptr_static = Marshal.AllocHGlobal(Marshal.SizeOf(static_info));
       }
 
-      void UpdateAllTelemetryStructs() {
-            UpdatePhysics(this.ptr_physics, Marshal.SizeOf(physics_info));
+      void UpdateAllTelemetrySources() {
+            // TODO: maybe update these exception messages
+            if (!UpdatePhysicsData(this.ptr_physics, Marshal.SizeOf(physics_info)))
+               throw new System.Exception("Physics data corrupted");
             this.physics_info = Marshal.PtrToStructure<SPageFilePhysics>(this.ptr_physics);
 
-            UpdateGraphics(this.ptr_graphics, Marshal.SizeOf(graphics_info));
+            if (!UpdateGraphicsData(this.ptr_graphics, Marshal.SizeOf(graphics_info)))
+               throw new System.Exception("Graphics data corrupted");
             this.graphics_info = Marshal.PtrToStructure<SPageFileGraphics>(ptr_graphics);
 
-            UpdateStatic(this.ptr_static, Marshal.SizeOf(static_info));
+            if (!UpdateStaticData(this.ptr_static, Marshal.SizeOf(static_info)))
+               throw new System.Exception("Static data corrupted");
             this.static_info = Marshal.PtrToStructure<SPageFileStatic>(this.ptr_static);
       }
       
@@ -83,20 +89,19 @@ namespace Driver {
       }
 
 #region DllImports
-      [DllImport(".\\acc_telemetry.dll", EntryPoint="update_physics_struct")]
-      static extern void UpdatePhysics(IntPtr PhysicsData, int struct_size);
+      [DllImport(DLL_DATA_FILE, EntryPoint="update_physics_data")]
+      static extern bool UpdatePhysicsData(IntPtr PhysicsData, int data_size);
 
-      [DllImport(".\\acc_telemetry.dll", EntryPoint="update_graphics_struct")]
-      static extern void UpdateGraphics(IntPtr GraphicsData, int struct_size);
+      [DllImport(DLL_DATA_FILE, EntryPoint="update_graphics_data")]
+      static extern bool UpdateGraphicsData(IntPtr GraphicsData, int data_size);
 
-      [DllImport(".\\acc_telemetry.dll", EntryPoint="update_static_struct")]
-      static extern void UpdateStatic(IntPtr StaticData, int struct_size);
+      [DllImport(DLL_DATA_FILE, EntryPoint="update_static_data")]
+      static extern bool UpdateStaticData(IntPtr StaticData, int data_size);
 #endregion
    }
 
    class CLI {
       public static void Main(string[] args) {
-         Console.WriteLine("Initializing...");
          TelemetryParser driver_telemetry = new TelemetryParser();
          driver_telemetry.main();
       }

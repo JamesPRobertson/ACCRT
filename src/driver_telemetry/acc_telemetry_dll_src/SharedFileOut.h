@@ -66,7 +66,7 @@ typedef int AC_FLAG_TYPE;
 #pragma pack(push)
 #pragma pack(4)
 
-CPPWIN32DLL_EXPORTS struct SPageFilePhysics
+struct SPageFilePhysics
 {
 
     int packetId = 0;
@@ -158,7 +158,7 @@ CPPWIN32DLL_EXPORTS struct SPageFilePhysics
 };
 
 
-CPPWIN32DLL_EXPORTS struct SPageFileGraphics
+struct SPageFileGraphics
 {
     int packetId = 0;
     AC_STATUS status = AC_OFF;
@@ -219,7 +219,7 @@ CPPWIN32DLL_EXPORTS struct SPageFileGraphics
 };
 
 
-CPPWIN32DLL_EXPORTS struct SPageFileStatic
+struct SPageFileStatic
 {
     wchar_t smVersion[15];
     wchar_t acVersion[15];
