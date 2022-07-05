@@ -4,6 +4,36 @@
 using System.Runtime.InteropServices;
 
 namespace AcpmfData {
+   public enum PenaltyShortcut: int {
+      None,
+      DriveThrough_Cutting,
+      StopAndGo_10_Cutting,
+      StopAndGo_20_Cutting,
+      StopAndGo_30_Cutting,
+      Disqualified_Cutting,
+      RemoveBestLaptime_Cutting,
+
+      DriveThrough_PitSpeeding,
+      StopAndGo_10_PitSpeeding,
+      StopAndGo_20_PitSpeeding,
+      StopAndGo_30_PitSpeeding,
+      Disqualified_PitSpeeding,
+      RemoveBestLaptime_PitSpeeding,
+
+      Disqualified_IgnoredMandatoryPit,
+
+      PostRaceTime,
+      Disqualified_Trolling,
+      Disqualified_PitEntry,
+      Disqualified_PitExit,
+      Disqualified_WrongWay,
+
+      DriveThrough_IgnoredDriverStint,
+      Disqualified_IgnoredDriverStint,
+
+      Disqualified_ExceededDriverStintLimit,
+   };
+
    public struct SPageFileGraphics {
       public int packetId;
       public int status;
@@ -35,7 +65,7 @@ namespace AcpmfData {
       public int playerCarID;
       public float penaltyTime;
       public int flag;
-      //PenaltyShortcut penalty = PenaltyShortcut::None;
+      public int penalty;
       public int idealLineOn;
       public int isInPitLane;
 
