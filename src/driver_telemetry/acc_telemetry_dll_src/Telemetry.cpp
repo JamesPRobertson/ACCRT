@@ -3,6 +3,7 @@
 #include <tchar.h>
 #include <iostream>
 #include "SharedFileOut.h"
+#include "stdbool.h"
 #include "TelemetryDll.h"
 #pragma optimize("",off)
 
@@ -20,8 +21,6 @@ struct SMElement {
 SMElement m_graphics;
 SMElement m_physics;
 SMElement m_static;
-
-int m_test_number = 1;
 
 void init_physics() {
     TCHAR szName[] = TEXT("Local\\acpmf_physics");
@@ -64,27 +63,38 @@ void dismiss(SMElement element) {
     CloseHandle(element.hMapFile);
 }
 
-CPPWIN32DLL_EXPORTS void update_graphics_struct(OUT SPageFileGraphics* destination) {
+CPPWIN32DLL_EXPORTS bool update_graphics_data(OUT SPageFileGraphics* ptr_phys_struct, size_t data_size) {
+    if (data_size != sizeof(SPageFileGraphics)) {
+        return false;
+    }
     if (!m_graphics.mapFileBuffer) {
         init_graphics();
     }
 
-    memcpy(destination, m_graphics.mapFileBuffer, sizeof(SPageFileGraphics));
+    memcpy(ptr_phys_struct, m_graphics.mapFileBuffer, data_size);
+    return true;
 }
 
-CPPWIN32DLL_EXPORTS void update_physics_struct(OUT SPageFilePhysics* destination) {
+CPPWIN32DLL_EXPORTS bool update_physics_data(OUT SPageFilePhysics* ptr_grph_struct, size_t data_size) {
+    if (data_size != sizeof(SPageFilePhysics)) {
+        return false;
+    }
     if (!m_physics.mapFileBuffer) {
         init_physics();
     }
 
-    memcpy(destination, m_physics.mapFileBuffer, sizeof(SPageFilePhysics));
+    memcpy(ptr_grph_struct, m_physics.mapFileBuffer, data_size);
+    return true;
 }
 
-CPPWIN32DLL_EXPORTS void update_static_struct(OUT SPageFileStatic* destination) {
+CPPWIN32DLL_EXPORTS bool update_static_data(OUT SPageFileStatic* ptr_stc_struct, size_t data_size) {
+    if (data_size != sizeof(SPageFileStatic)) {
+        return false;
+    }
     if (!m_static.mapFileBuffer) {
         init_static();
     }
 
-    memcpy(destination, m_static.mapFileBuffer, sizeof(SPageFileStatic));
+    memcpy(ptr_stc_struct, m_static.mapFileBuffer, data_size);
+    return true;
 }
-
