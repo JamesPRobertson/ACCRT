@@ -38,10 +38,14 @@ namespace AcpmfData {
       public int packetId;
       public int status;
       public int session;
-      public IntPtr currentTime;
-      public IntPtr lastTime;
-      public IntPtr bestTime;
-      public IntPtr split;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
+      public string currentTime;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
+      public string lastTime;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
+      public string bestTime;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
+      public string split;
       public int completedLaps;
       public int position;
       public int iCurrentTime;
@@ -53,7 +57,8 @@ namespace AcpmfData {
       public int currentSectorIndex;
       public int lastSectorTime;
       public int numberOfLaps;
-      public IntPtr tyreCompound;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
+      public string tyreCompound;
       public float replayTimeMultiplier;
       public float normalizedCarPosition;
 
@@ -212,18 +217,26 @@ namespace AcpmfData {
       public float[] tyreTemp;
    };
 
+   [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
    public struct SPageFileStatic {
-      public IntPtr smVersion;
-      public IntPtr acVersion;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
+      public string smVersion;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
+      public string acVersion;
 
       // session static info
       public int numberOfSessions;
       public int numCars;
-      public IntPtr carModel;
-      public IntPtr track;
-      public IntPtr playerName;
-      public IntPtr playerSurname;
-      public IntPtr playerNick;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
+      public string carModel;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
+      public string track;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
+      public string playerName;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
+      public string playerSurname;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
+      public string playerNick;
       public int sectorCount;
 
       // car static info
@@ -255,13 +268,15 @@ namespace AcpmfData {
       public int engineBrakeSettingsCount;
       public int ersPowerControllerCount;
       public float trackSPlineLengthf;
-      public IntPtr trackConfiguration;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
+      public string trackConfiguration;
       public float ersMaxJ;
 
       public int isTimedRace;
       public int hasExtraLap;
 
-      public IntPtr carSkin;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
+      public string carSkin;
       public int reversedGridPositions;
       public int PitWindowStart;
       public int PitWindowEnd;
