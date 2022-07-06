@@ -10,8 +10,8 @@ namespace Server {
    class TelemetryServer {
       TelemetryParser telemetry_source;
 
-      const int PORT = 11000;
-      const string IP_ADDRESS = "192.168.1.113";
+      const int PORT = 9000;
+      const string IP_ADDRESS = "99.129.97.238";
 
       public TelemetryServer() {
          telemetry_source = new TelemetryParser();
