@@ -64,20 +64,21 @@ namespace Driver {
          List<string> stringy_data = new List<string>();
          stringy_data.Add($"Current Packet: {this.physics_info.packetId}\n");
          stringy_data.Add("Temperatures:\n");
-         stringy_data.Add($"   Air:     {this.physics_info.airTemp:00} c\n");
-         stringy_data.Add($"   Track:   {this.physics_info.roadTemp:00} c\n\n");
+         stringy_data.Add($"   Air:      {this.physics_info.airTemp:00} c\n");
+         stringy_data.Add($"   Track:    {this.physics_info.roadTemp:00} c\n\n");
          
-         stringy_data.Add($"speed:      {this.physics_info.speedKmh:000.0} km/h\n");
-         stringy_data.Add($"throttle:   {this.physics_info.gas:0.00%}\n");
-         stringy_data.Add($"brake:      {this.physics_info.brake:0.00%}\n");
-         stringy_data.Add($"RPM:        {this.physics_info.rpms}\n");
-         stringy_data.Add($"gear:       {this.physics_info.gear}\n");
-         stringy_data.Add($"fuel:       {this.physics_info.fuel:0.00} L\n\n");
+         stringy_data.Add($"speed:       {this.physics_info.speedKmh:000.0} km/h\n");
+         stringy_data.Add($"throttle:    {this.physics_info.gas:0.00%}\n");
+         stringy_data.Add($"brake:       {this.physics_info.brake:0.00%}\n");
+         stringy_data.Add($"RPM:         {this.physics_info.rpms}\n");
+         stringy_data.Add($"gear:        {this.physics_info.gear}\n");
+         stringy_data.Add($"fuel:        {this.physics_info.fuel:0.00} L\n");
+         stringy_data.Add($"fuel / lap:  {this.graphics_info.fuelXLap:0.00} L\n\n");
 
-         stringy_data.Add("---------------------------------------------\n");
-         stringy_data.Add($"Lap Time:   {this.graphics_info.currentTime} : ");
-         stringy_data.Add($"Last Lap:   {this.graphics_info.lastTime} : ");
-         stringy_data.Add($"Best Lap:   {this.graphics_info.bestTime}\n");
+         stringy_data.Add("------------------------------------\n");
+         stringy_data.Add($"Lap Time:    {this.graphics_info.currentTime}\n");
+         stringy_data.Add($"Last Lap:    {this.graphics_info.lastTime}\n");
+         stringy_data.Add($"Best Lap:    {this.graphics_info.bestTime}\n");
 
          stringy_data.Add($"Current Track:  {this.static_info.track}");
 
