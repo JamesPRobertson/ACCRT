@@ -1,4 +1,5 @@
-﻿using AcpmfData;
+using AcpmfData;
+using Server;
 using System.Runtime.InteropServices;
 
 namespace Driver {
@@ -103,7 +104,11 @@ namespace Driver {
    class CLI {
       public static void Main(string[] args) {
          TelemetryParser driver_telemetry = new TelemetryParser();
-         driver_telemetry.main();
+         //driver_telemetry.main();
+
+         // https://www.geeksforgeeks.org/socket-programming-in-c-sharp/
+         //TelemetryServer.ExecuteTCPServer();
+         TelemetryServer.ExecuteUDPServer();
       }
    }
 }
