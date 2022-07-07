@@ -10,18 +10,15 @@ namespace Server {
    class TelemetryServer {
       TelemetryParser telemetry_source;
 
-      const int PORT = 9000;
-      const string IP_ADDRESS = "192.168.1.113";
-
       public TelemetryServer() {
          telemetry_source = new TelemetryParser();
       }
 
-      public void ExecuteUDPServer() {
+      public void ExecuteUDPServer(string server_ip_address, int port) {
          // This address must be changed based on your system
-         IPAddress broadcast = IPAddress.Parse(IP_ADDRESS);
+         IPAddress broadcast = IPAddress.Parse(server_ip_address);
          Socket broadcaster  = new Socket(broadcast.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-         IPEndPoint local_endpoint = new IPEndPoint(broadcast, PORT);
+         IPEndPoint local_endpoint = new IPEndPoint(broadcast, port);
          Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}");
 
          broadcaster.Bind(local_endpoint);
@@ -45,11 +42,9 @@ namespace Server {
             byte[] sendbuf = Encoding.ASCII.GetBytes(string_data);
 
             broadcaster.SendTo(sendbuf, remote_caller);
-
             
-            Console.Write("s");
-            // 10 Hz
-            Thread.Sleep(100);
+            // 20 Hz
+            Thread.Sleep(50);
          }
       }
    }

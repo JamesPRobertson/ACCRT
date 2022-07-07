@@ -110,12 +110,6 @@ namespace Driver {
                throw new System.Exception("Static data corrupted");
             this.static_info = Marshal.PtrToStructure<SPageFileStatic>(this.ptr_static);
       }
-      
-      void CustomPrintError(string message) {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-            Console.ForegroundColor = ConsoleColor.White;
-      }
 
 #region DllImports
       [DllImport(DLL_DATA_FILE, EntryPoint="update_physics_data")]
@@ -131,11 +125,19 @@ namespace Driver {
 
    class CLI {
       public static void Main(string[] args) {
-         //TelemetryParser driver_telemetry = new TelemetryParser();
-         //driver_telemetry.main();
+         if (args.Length < 2) {
+            CustomPrintError("ERROR: Two arguments [IP Address] and [Port] must be supplied!");
+            return;
+         }
 
          TelemetryServer output_sver = new TelemetryServer();
-         output_sver.ExecuteUDPServer();
+         output_sver.ExecuteUDPServer(args[0], Int32.Parse(args[1]));
+      }
+
+      public static void CustomPrintError(string message) {
+         Console.ForegroundColor = ConsoleColor.Red;
+         Console.WriteLine(message);
+         Console.ForegroundColor = ConsoleColor.White;
       }
    }
 }
