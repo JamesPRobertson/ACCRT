@@ -29,60 +29,40 @@ namespace Driver {
       }
 
       public void TestPrintData() {
-         while(true){
-            UpdateAllTelemetrySources();
-            Console.Clear();
-
-            Console.WriteLine($"Current Packet: {this.physics_info.packetId}\n");
-            Console.WriteLine("Temperatures:");
-            Console.WriteLine($"   Air:     {this.physics_info.airTemp:00} c");
-            Console.WriteLine($"   Track:   {this.physics_info.roadTemp:00} c\n");
-            
-            Console.WriteLine($"Speed:      {this.physics_info.speedKmh:000.0} km/h");
-            Console.WriteLine($"throttle:   {this.physics_info.gas:0.00%}");
-            Console.WriteLine($"brake:      {this.physics_info.brake:0.00%}\n");
-            Console.WriteLine($"RPM:        {this.physics_info.rpms}");
-            Console.WriteLine($"gear:       {this.physics_info.gear}");
-            Console.WriteLine($"fuel:       {this.physics_info.fuel:0.00} L\n");
-
-            Console.WriteLine("---------------------------------------------\n");
-            Console.WriteLine($"Lap Time:   {this.graphics_info.currentTime}");
-            Console.WriteLine($"Last Lap:   {this.graphics_info.lastTime}");
-            Console.WriteLine($"Best Lap:   {this.graphics_info.bestTime}\n");
-
-            Console.WriteLine($"Current Track:  {this.static_info.track}");
-
-            Thread.Sleep(16);
-         }
-
-         return;
+         Console.WriteLine(String.Join("\n", this.GetTelemetryData()));
       }
 
-      public List<string> GetDataToSend() {
+      public List<string> GetTelemetryData() {
          UpdateAllTelemetrySources();
 
-         List<string> stringy_data = new List<string>();
-         stringy_data.Add($"Current Packet: {this.physics_info.packetId}\n");
-         stringy_data.Add("Temperatures:\n");
-         stringy_data.Add($"   Air:      {this.physics_info.airTemp:00} c\n");
-         stringy_data.Add($"   Track:    {this.physics_info.roadTemp:00} c\n\n");
+         List<string> data = new List<string>();
+
+         data.Add("----------------------------------------------\n");
+         data.Add($"Current Packet: {this.physics_info.packetId}");
+         data.Add("Temperatures:");
+         data.Add($"   Air:      {this.physics_info.airTemp:00} c");
+         data.Add($"   Track:    {this.physics_info.roadTemp:00} c");
+         data.Add("\n");
          
-         stringy_data.Add($"speed:       {this.physics_info.speedKmh:000.0} km/h\n");
-         stringy_data.Add($"throttle:    {this.physics_info.gas:0.00%}\n");
-         stringy_data.Add($"brake:       {this.physics_info.brake:0.00%}\n");
-         stringy_data.Add($"RPM:         {this.physics_info.rpms}\n");
-         stringy_data.Add($"gear:        {this.physics_info.gear}\n");
-         stringy_data.Add($"fuel:        {this.physics_info.fuel:0.00} L\n");
-         stringy_data.Add($"fuel / lap:  {this.graphics_info.fuelXLap:0.00} L\n\n");
+         data.Add($"speed:       {this.physics_info.speedKmh:000.0} km/h");
+         data.Add($"throttle:    {this.physics_info.gas:0.00%}");
+         data.Add($"brake:       {this.physics_info.brake:0.00%}");
+         data.Add($"RPM:         {this.physics_info.rpms}");
+         data.Add($"gear:        {this.physics_info.gear}");
+         data.Add($"fuel:        {this.physics_info.fuel:0.00} L");
+         data.Add($"fuel / lap:  {this.graphics_info.fuelXLap:0.00} L");
+         data.Add("\n");
 
-         stringy_data.Add("------------------------------------\n");
-         stringy_data.Add($"Lap Time:    {this.graphics_info.currentTime}\n");
-         stringy_data.Add($"Last Lap:    {this.graphics_info.lastTime}\n");
-         stringy_data.Add($"Best Lap:    {this.graphics_info.bestTime}\n");
+         data.Add("-------------------------------\n");
+         data.Add($"Lap Time:    {this.graphics_info.currentTime}");
+         data.Add($"Last Lap:    {this.graphics_info.lastTime}");
+         data.Add($"Best Lap:    {this.graphics_info.bestTime}");
+         data.Add("\n");
 
-         stringy_data.Add($"Current Track:  {this.static_info.track}");
+         data.Add($"Current Track:  {this.static_info.track}");
+         data.Add("\n");
 
-         return stringy_data;
+         return data;
       }
 
       void InitializeTelemetry() {
@@ -130,8 +110,8 @@ namespace Driver {
             return;
          }
 
-         TelemetryServer output_sver = new TelemetryServer();
-         output_sver.ExecuteUDPServer(args[0], Int32.Parse(args[1]));
+         TelemetryServer output_server = new TelemetryServer();
+         output_server.ExecuteUDPServer(args[0], Int32.Parse(args[1]));
       }
 
       public static void CustomPrintError(string message) {

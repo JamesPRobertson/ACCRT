@@ -8,14 +8,13 @@ using Driver;
 
 namespace Server {
    class TelemetryServer {
-      TelemetryParser telemetry_source;
+      readonly TelemetryParser telemetry_source;
 
       public TelemetryServer() {
          telemetry_source = new TelemetryParser();
       }
 
       public void ExecuteUDPServer(string server_ip_address, int port) {
-         // This address must be changed based on your system
          IPAddress broadcast = IPAddress.Parse(server_ip_address);
          Socket broadcaster  = new Socket(broadcast.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
          IPEndPoint local_endpoint = new IPEndPoint(broadcast, port);
@@ -35,10 +34,7 @@ namespace Server {
          broadcaster.SendTo(Encoding.ASCII.GetBytes("Thanks!\n"), remote_caller);
 
          while(true) {
-            string string_data = "";
-            foreach (string line in this.telemetry_source.GetDataToSend()) {
-               string_data += line;
-            }
+            string string_data = String.Join("\n", this.telemetry_source.GetTelemetryData());
             byte[] sendbuf = Encoding.ASCII.GetBytes(string_data);
 
             broadcaster.SendTo(sendbuf, remote_caller);
