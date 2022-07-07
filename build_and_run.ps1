@@ -8,8 +8,20 @@ param(
 
 $START_DIR = "$PWD"
 
-$CONFIG = ($release) ? "Release" : "Debug"
-$LOG_LEVEL = ($detailed_logging) ? "detailed" : "normal"
+if($release) {
+    $CONFIG = "Release"
+}
+else {
+    $CONFIG = "Debug"
+}
+
+if($detailed_logging) {
+    $LOG_LEVEL = "detailed"
+}
+else {
+    $LOG_LEVEL = "normal"
+}
+
 $SLN_DIR = "$PWD\src\driver_telemetry"
 $OUTPUT_DIR = "$SLN_DIR\bin\$CONFIG\net6.0"
 $EXECUTABLE_NAME = "driver_telemetry.exe"

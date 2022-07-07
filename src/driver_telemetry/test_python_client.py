@@ -14,13 +14,11 @@ def udp_testing():
     client_socket.bind(local_address)
     client_socket.sendto(b"I request data now", server_address)
 
-    msgFromServer = ""
+    message_str = ""
 
     while True:
-        print("PREPARING TO HEAR BACK :3")
-        msgFromServer = client_socket.recvfrom(bufferSize)[0]
-        #client_socket.sendto(b"give me packets", server_address)
-        print("RECV: " + str(msgFromServer, encoding="ASCII"), "\n\n")
+        message_str = client_socket.recvfrom(bufferSize)[0]
+        print("RECV: " + str(message_str, encoding="ASCII"), "\n\n")
 
 if __name__ == "__main__":
     udp_testing()
