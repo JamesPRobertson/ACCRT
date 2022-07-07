@@ -3,11 +3,11 @@ name: MSBuild
 on:
   push:
     branches:
-    - main
+    - master
     - 'release/**'
     - 'workflow**'
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 env:
   # Path to the solution file relative to the root of the project.

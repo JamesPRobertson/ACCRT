@@ -1,5 +1,7 @@
 ﻿using AcpmfData;
+using Server;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace Driver {
    class TelemetryParser {
@@ -26,34 +28,41 @@ namespace Driver {
          ptr_static   = IntPtr.Zero;
       }
 
-      public void main() {
-         while(true){
-            UpdateAllTelemetrySources();
-            Console.Clear();
+      public void TestPrintData() {
+         Console.WriteLine(String.Join("\n", this.GetTelemetryData()));
+      }
 
-            Console.WriteLine($"Current Packet: {this.physics_info.packetId}\n");
-            Console.WriteLine("Temperatures:");
-            Console.WriteLine($"   Air:     {this.physics_info.airTemp:00} c");
-            Console.WriteLine($"   Track:   {this.physics_info.roadTemp:00} c\n");
-            
-            Console.WriteLine($"Speed:      {this.physics_info.speedKmh:000.0} km/h");
-            Console.WriteLine($"throttle:   {this.physics_info.gas:0.00%}");
-            Console.WriteLine($"brake:      {this.physics_info.brake:0.00%}\n");
-            Console.WriteLine($"RPM:        {this.physics_info.rpms}");
-            Console.WriteLine($"gear:       {this.physics_info.gear}");
-            Console.WriteLine($"fuel:       {this.physics_info.fuel:0.00} L\n");
+      public List<string> GetTelemetryData() {
+         UpdateAllTelemetrySources();
 
-            Console.WriteLine("---------------------------------------------\n");
-            Console.WriteLine($"Lap Time:   {this.graphics_info.currentTime}");
-            Console.WriteLine($"Last Lap:   {this.graphics_info.lastTime}");
-            Console.WriteLine($"Best Lap:   {this.graphics_info.bestTime}\n");
+         List<string> data = new List<string>();
 
-            Console.WriteLine($"Current Track:  {this.static_info.track}");
+         data.Add("----------------------------------------------\n");
+         data.Add($"Current Packet: {this.physics_info.packetId}");
+         data.Add("Temperatures:");
+         data.Add($"   Air:      {this.physics_info.airTemp:00} c");
+         data.Add($"   Track:    {this.physics_info.roadTemp:00} c");
+         data.Add("\n");
+         
+         data.Add($"speed:       {this.physics_info.speedKmh:000.0} km/h");
+         data.Add($"throttle:    {this.physics_info.gas:0.00%}");
+         data.Add($"brake:       {this.physics_info.brake:0.00%}");
+         data.Add($"RPM:         {this.physics_info.rpms}");
+         data.Add($"gear:        {this.physics_info.gear}");
+         data.Add($"fuel:        {this.physics_info.fuel:0.00} L");
+         data.Add($"fuel / lap:  {this.graphics_info.fuelXLap:0.00} L");
+         data.Add("\n");
 
-            Thread.Sleep(16);
-         }
+         data.Add("-------------------------------\n");
+         data.Add($"Lap Time:    {this.graphics_info.currentTime}");
+         data.Add($"Last Lap:    {this.graphics_info.lastTime}");
+         data.Add($"Best Lap:    {this.graphics_info.bestTime}");
+         data.Add("\n");
 
-         return;
+         data.Add($"Current Track:  {this.static_info.track}");
+         data.Add("\n");
+
+         return data;
       }
 
       void InitializeTelemetry() {
@@ -81,12 +90,6 @@ namespace Driver {
                throw new System.Exception("Static data corrupted");
             this.static_info = Marshal.PtrToStructure<SPageFileStatic>(this.ptr_static);
       }
-      
-      void CustomPrintError(string message) {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-            Console.ForegroundColor = ConsoleColor.White;
-      }
 
 #region DllImports
       [DllImport(DLL_DATA_FILE, EntryPoint="update_physics_data")]
@@ -102,8 +105,19 @@ namespace Driver {
 
    class CLI {
       public static void Main(string[] args) {
-         TelemetryParser driver_telemetry = new TelemetryParser();
-         driver_telemetry.main();
+         if (args.Length < 2) {
+            CustomPrintError("ERROR: Two arguments [IP Address] and [Port] must be supplied!");
+            return;
+         }
+
+         TelemetryServer output_server = new TelemetryServer();
+         output_server.ExecuteUDPServer(args[0], Int32.Parse(args[1]));
+      }
+
+      public static void CustomPrintError(string message) {
+         Console.ForegroundColor = ConsoleColor.Red;
+         Console.WriteLine(message);
+         Console.ForegroundColor = ConsoleColor.White;
       }
    }
 }
