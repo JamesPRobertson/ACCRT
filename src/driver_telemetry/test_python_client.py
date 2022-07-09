@@ -17,6 +17,9 @@ def udp_testing():
 
     message_str = ""
 
+    initial_message_str = client_socket.recvfrom(bufferSize)[0]
+    print("Inital message: " + str(initial_message_str, encoding="ASCII"), "\n\n")
+
     while True:
         message_str = client_socket.recvfrom(bufferSize)[0]
 
