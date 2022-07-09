@@ -29,7 +29,6 @@ namespace Server {
          // Using IPAddress.Any should allow us to receive a message from any IP
          EndPoint remote_caller = new IPEndPoint(IPAddress.Any, 0);
 
-
          // Attempt to see who's calling
          // Note: an engineer must connect before data will start sending
          byte[] message = new byte[BUFFER_SIZE];
@@ -38,7 +37,7 @@ namespace Server {
          broadcaster.SendTo(Encoding.ASCII.GetBytes($"init data transmission: {MS_DELAY} ms\n"), remote_caller);
 
          while(true) {
-            string json_data = String.Join("", this.telemetry_source.GetJSONTelemetryData());
+            string json_data = String.Join("|||", this.telemetry_source.GetJSONTelemetryData());
             byte[] sendbuf = Encoding.ASCII.GetBytes(json_data);
 
             broadcaster.SendTo(sendbuf, remote_caller);
