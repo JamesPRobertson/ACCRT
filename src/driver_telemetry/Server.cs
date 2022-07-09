@@ -26,7 +26,7 @@ namespace Server {
          
          // SendTo requries a reference to an EndPoint specifically so we do this.
          // Using IPAddress.Any should allow us to receive a message from any IP
-         EndPoint remote_caller = (EndPoint) new IPEndPoint(IPAddress.Any, 0);
+         EndPoint remote_caller = new IPEndPoint(IPAddress.Any, 0);
 
 
          // Attempt to see who's calling
