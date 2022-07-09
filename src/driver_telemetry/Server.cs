@@ -8,6 +8,8 @@ using Driver;
 
 namespace Server {
    class TelemetryServer {
+      const int BUFFER_SIZE = 1024;
+
       readonly TelemetryParser telemetry_source;
 
       public TelemetryServer() {
@@ -21,16 +23,17 @@ namespace Server {
          Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}");
 
          broadcaster.Bind(local_endpoint);
+         
+         // SendTo requries a reference to an EndPoint specifically so we do this.
+         // Using IPAddress.Any should allow us to receive a message from any IP
+         EndPoint remote_caller = (EndPoint) new IPEndPoint(IPAddress.Any, 0);
+
 
          // Attempt to see who's calling
-         byte[] message = new byte[4096];
-         
-         IPEndPoint caller = new IPEndPoint(IPAddress.Any, 0);
-         EndPoint remote_caller = (EndPoint)caller;
-
-         // Note: this is blocking
+         // Note: an engineer must connect before data will start sending
+         byte[] message = new byte[BUFFER_SIZE];
          broadcaster.ReceiveFrom(message, ref remote_caller);
-         Console.WriteLine($"Received {Encoding.ASCII.GetString(message)} from {remote_caller}");
+         Console.WriteLine($"Received '{Encoding.ASCII.GetString(message)}' from {remote_caller}");
          broadcaster.SendTo(Encoding.ASCII.GetBytes("Thanks!\n"), remote_caller);
 
          while(true) {
@@ -42,6 +45,7 @@ namespace Server {
             // 20 Hz
             Thread.Sleep(50);
          }
+         broadcaster.Dispose();
       }
    }
 }
