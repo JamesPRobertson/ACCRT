@@ -9,6 +9,7 @@ using Driver;
 namespace Server {
    class TelemetryServer {
       const int BUFFER_SIZE = 1024;
+      const int MS_DELAY    = 50; // 20 Hz
 
       readonly TelemetryParser telemetry_source;
 
@@ -34,7 +35,7 @@ namespace Server {
          byte[] message = new byte[BUFFER_SIZE];
          broadcaster.ReceiveFrom(message, ref remote_caller);
          Console.WriteLine($"Received '{Encoding.ASCII.GetString(message)}' from {remote_caller}");
-         broadcaster.SendTo(Encoding.ASCII.GetBytes("Thanks!\n"), remote_caller);
+         broadcaster.SendTo(Encoding.ASCII.GetBytes($"init data transmission: {MS_DELAY} ms\n"), remote_caller);
 
          while(true) {
             //string string_data = String.Join("\n", this.telemetry_source.GetStringTelemetryData());
@@ -44,8 +45,7 @@ namespace Server {
 
             broadcaster.SendTo(sendbuf, remote_caller);
             
-            // 20 Hz
-            Thread.Sleep(50);
+            Thread.Sleep(MS_DELAY);
          }
          broadcaster.Dispose();
       }

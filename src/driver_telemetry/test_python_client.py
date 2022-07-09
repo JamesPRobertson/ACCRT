@@ -17,6 +17,9 @@ def udp_testing():
 
     message_str = ""
 
+    initial_message_str = client_socket.recvfrom(bufferSize)[0]
+    print("Inital message: " + str(initial_message_str, encoding="ASCII"), "\n\n")
+
     while True:
         message_str = client_socket.recvfrom(bufferSize)[0]
         message_json = json.loads(message_str)
@@ -36,7 +39,6 @@ def udp_testing():
         print(f"fuel:        {message_json['fuel']} L")
         print(f"-------------------------------\n")
         print(f"\n")
-        #print("RECV: " + str(message_str, encoding="ASCII"), "\n\n")
         
 
 if __name__ == "__main__":
