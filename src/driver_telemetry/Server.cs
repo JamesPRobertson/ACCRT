@@ -1,8 +1,8 @@
 // Check if all imports are needed.
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 
 using Driver;
 
@@ -37,8 +37,10 @@ namespace Server {
          broadcaster.SendTo(Encoding.ASCII.GetBytes("Thanks!\n"), remote_caller);
 
          while(true) {
-            string string_data = String.Join("\n", this.telemetry_source.GetTelemetryData());
-            byte[] sendbuf = Encoding.ASCII.GetBytes(string_data);
+            //string string_data = String.Join("\n", this.telemetry_source.GetStringTelemetryData());
+            //byte[] sendbuf = Encoding.ASCII.GetBytes(string_data);
+            string json_data = telemetry_source.GetJSONTelemetryData();
+            byte[] sendbuf = Encoding.ASCII.GetBytes(json_data);
 
             broadcaster.SendTo(sendbuf, remote_caller);
             

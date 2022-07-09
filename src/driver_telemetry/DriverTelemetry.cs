@@ -1,7 +1,7 @@
 ﻿using AcpmfData;
 using Server;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Driver {
    class TelemetryParser {
@@ -29,10 +29,22 @@ namespace Driver {
       }
 
       public void TestPrintData() {
-         Console.WriteLine(String.Join("\n", this.GetTelemetryData()));
+         Console.WriteLine(String.Join("\n", this.GetStringTelemetryData()));
       }
 
-      public List<string> GetTelemetryData() {
+      public string GetJSONTelemetryData() {
+         this.UpdateAllTelemetrySources();
+
+         JsonSerializerOptions json_options = new JsonSerializerOptions();
+         // For human readability in debug
+         //json_options.WriteIndented = true;
+         json_options.IncludeFields = true;
+
+         string telemetry_data = JsonSerializer.Serialize<SPageFilePhysics>(this.physics_info, json_options);
+         return telemetry_data;
+      }
+
+      public List<string> GetStringTelemetryData() {
          UpdateAllTelemetrySources();
 
          List<string> data = new List<string>();

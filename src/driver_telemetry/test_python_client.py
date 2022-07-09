@@ -1,3 +1,4 @@
+import json
 import socket
 
 IP_ADDR = "99.129.97.238"
@@ -18,7 +19,25 @@ def udp_testing():
 
     while True:
         message_str = client_socket.recvfrom(bufferSize)[0]
-        print("RECV: " + str(message_str, encoding="ASCII"), "\n\n")
+        message_json = json.loads(message_str)
+
+        print(f"----------------------------------------------\n")
+        print(f"Current Packet: {message_json['packetId']}")
+        print(f"Temperatures:")
+        print(f"   Air:      {message_json['airTemp']} c")
+        print(f"   Track:    {message_json['roadTemp']} c")
+        print(f"\n")
+        
+        print(f"speed:       {message_json['speedKmh']} km/h")
+        print(f"throttle:    {message_json['gas']}")
+        print(f"brake:       {message_json['brake']}")
+        print(f"RPM:         {message_json['rpms']}")
+        print(f"gear:        {message_json['gear']}")
+        print(f"fuel:        {message_json['fuel']} L")
+        print(f"-------------------------------\n")
+        print(f"\n")
+        #print("RECV: " + str(message_str, encoding="ASCII"), "\n\n")
+        
 
 if __name__ == "__main__":
     udp_testing()
