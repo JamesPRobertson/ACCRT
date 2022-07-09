@@ -38,9 +38,7 @@ namespace Server {
          broadcaster.SendTo(Encoding.ASCII.GetBytes($"init data transmission: {MS_DELAY} ms\n"), remote_caller);
 
          while(true) {
-            //string string_data = String.Join("\n", this.telemetry_source.GetStringTelemetryData());
-            //byte[] sendbuf = Encoding.ASCII.GetBytes(string_data);
-            string json_data = telemetry_source.GetJSONTelemetryData();
+            string json_data = String.Join("", this.telemetry_source.GetJSONTelemetryData());
             byte[] sendbuf = Encoding.ASCII.GetBytes(json_data);
 
             broadcaster.SendTo(sendbuf, remote_caller);

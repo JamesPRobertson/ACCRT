@@ -38,7 +38,12 @@ def udp_testing():
             print(f"RPM:         {message_json['rpms']}")
             print(f"gear:        {message_json['gear']}")
             print(f"fuel:        {message_json['fuel']} L")
-            print(f"-------------------------------\n")
+            print(f"-------------------------------")
+            print(f"Lap Time:    {message_json['currentTime']}")
+            print(f"Last Lap:    {message_json['lastTime']}")
+            print(f"Best Lap:    {message_json['bestTime']}")
+            print(f"")
+            print(f"Current Track:  {message_json['track']}")
             print(f"\n")
         except Exception as e:
             message_txt = str(message_str, encoding="ASCII")

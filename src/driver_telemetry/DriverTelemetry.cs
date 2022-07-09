@@ -32,16 +32,21 @@ namespace Driver {
          Console.WriteLine(String.Join("\n", this.GetStringTelemetryData()));
       }
 
-      public string GetJSONTelemetryData() {
+      public List<string> GetJSONTelemetryData() {
          this.UpdateAllTelemetrySources();
+
+         List<string> telemetry = new List<string>();
 
          JsonSerializerOptions json_options = new JsonSerializerOptions();
          // For human readability in debug
          //json_options.WriteIndented = true;
          json_options.IncludeFields = true;
 
-         string telemetry_data = JsonSerializer.Serialize<SPageFilePhysics>(this.physics_info, json_options);
-         return telemetry_data;
+         telemetry.Add(JsonSerializer.Serialize<SPageFilePhysics>(this.physics_info, json_options));
+         telemetry.Add(JsonSerializer.Serialize<SPageFileGraphics>(this.graphics_info, json_options));
+         telemetry.Add(JsonSerializer.Serialize<SPageFileStatic>(this.static_info, json_options));
+
+         return telemetry;
       }
 
       public List<string> GetStringTelemetryData() {
