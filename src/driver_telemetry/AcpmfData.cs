@@ -1,6 +1,3 @@
-// Disable warning about unused variables for development
-#pragma warning disable CS0414
-
 using System.Runtime.InteropServices;
 
 namespace AcpmfData {
@@ -286,6 +283,3 @@ namespace AcpmfData {
       public int isOnline;
    };
 }
-
-// Reenable the warning for unused variables
-#pragma warning restore CS0414

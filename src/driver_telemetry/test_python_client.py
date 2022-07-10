@@ -4,7 +4,7 @@ import socket
 IP_ADDR = "99.129.97.238"
 PORT    = 9000
 
-EOM_STRING = "|||"
+JSON_DELIMITER = b"|||"
 
 def udp_testing():
     # This address must be changed based on your system
@@ -26,7 +26,7 @@ def udp_testing():
         message_str = client_socket.recvfrom(bufferSize)[0]
 
         try:
-            physics_str, graphics_str, static_str = message_str.split(EOM_STRING)
+            physics_str, graphics_str, static_str = message_str.split(JSON_DELIMITER)
 
             physics_json  = json.loads(physics_str)
             graphics_json = json.loads(graphics_str)

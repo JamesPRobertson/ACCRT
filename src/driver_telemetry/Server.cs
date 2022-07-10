@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.Json;
 
 using Driver;
 
@@ -10,6 +9,7 @@ namespace Server {
    class TelemetryServer {
       const int BUFFER_SIZE = 1024;
       const int MS_DELAY    = 50; // 20 Hz
+      const string JSON_DELIMITER = "|||";
 
       readonly TelemetryParser telemetry_source;
 
@@ -37,13 +37,14 @@ namespace Server {
          broadcaster.SendTo(Encoding.ASCII.GetBytes($"init data transmission: {MS_DELAY} ms\n"), remote_caller);
 
          while(true) {
-            string json_data = String.Join("|||", this.telemetry_source.GetJSONTelemetryData());
+            string json_data = String.Join(JSON_DELIMITER, this.telemetry_source.GetJSONTelemetryData());
             byte[] sendbuf = Encoding.ASCII.GetBytes(json_data);
 
             broadcaster.SendTo(sendbuf, remote_caller);
             
             Thread.Sleep(MS_DELAY);
          }
+
          broadcaster.Dispose();
       }
    }
