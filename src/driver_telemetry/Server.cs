@@ -93,14 +93,14 @@ namespace Server {
             if (e.Buffer == null || e.RemoteEndPoint == null) {
                 throw new NullReferenceException();
             }
-            Console.WriteLine($"Received '{Encoding.ASCII.GetString(e.Buffer)}' from {e.RemoteEndPoint} at {connection_request_time_ms}ms");
+            // For debug purposes
+            //Console.WriteLine($"Received '{Encoding.ASCII.GetString(e.Buffer)}' from {e.RemoteEndPoint} at {connection_request_time_ms}ms");
 
-            if (e.SocketError != SocketError.Success) {
-                Console.WriteLine($"Error {e.SocketError}");
-            } else {
-                Console.WriteLine($"Adding {e.RemoteEndPoint}");
-                connected_clients[e.RemoteEndPoint] = connection_request_time_ms;
+            if (e.SocketError == SocketError.Success) {
+               Console.WriteLine($"Adding {e.RemoteEndPoint}");
+               connected_clients[e.RemoteEndPoint] = connection_request_time_ms;
             }
+
             e.Dispose();
             connection_listner_args = BuildConnectionListener();
             broadcaster.ReceiveFromAsync(connection_listner_args);
