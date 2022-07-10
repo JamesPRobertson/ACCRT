@@ -121,8 +121,8 @@ namespace Driver {
 
    class CLI {
       public static void Main(string[] args) {
-         TelemetryServer output_server = new TelemetryServer();
-         output_server.ExecuteUDPServer(args);
+         TelemetryServer output_server = new TelemetryServer(args);
+         output_server.ExecuteUDPServer();
       }
 
       public static void CustomPrintError(string message) {

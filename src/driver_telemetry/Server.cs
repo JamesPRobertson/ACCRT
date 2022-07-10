@@ -9,51 +9,102 @@ namespace Server {
    class TelemetryServer {
       const int BUFFER_SIZE = 1024;
       const int MS_DELAY    = 50; // 20 Hz
-      const string JSON_DELIMITER = "|||";
+      const int CONNECTED_CLIENT_TIMEOUT_MS = 5000;
 
       const int DEFAULT_PORT = 9000;
 
+      private int port = DEFAULT_PORT;
+      private IPAddress broadcast_address = IPAddress.Any;
+      private Socket broadcaster;
+      private IPEndPoint local_endpoint;
+
+      private SocketAsyncEventArgs connectionListnerArgs;
+      private byte[] connectionListenerBuffer;
+
       readonly TelemetryParser telemetry_source;
 
-      public TelemetryServer() {
+      private Dictionary<EndPoint, long> connected_clients = new Dictionary<EndPoint, long>();
+
+      public TelemetryServer(string[] args) {
          telemetry_source = new TelemetryParser();
+
+         if (args.Length >= 2) {
+            this.broadcast_address = IPAddress.Parse(args[0]);
+            this.port = Int32.Parse(args[1]);
+         }
+         
+         this.broadcaster  = new Socket(this.broadcast_address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+         this.local_endpoint = new IPEndPoint(this.broadcast_address, this.port);
+
+         connectionListenerBuffer = new byte[BUFFER_SIZE];
+         this.connectionListnerArgs = BuildConnectionListener();
       }
 
-      public void ExecuteUDPServer(string[] args) {
-         int port = DEFAULT_PORT;
-         IPAddress broadcast = IPAddress.Any;
-         
-         if (args.Length >= 2) {
-            broadcast = IPAddress.Parse(args[0]);
-            port = Int32.Parse(args[1]);
-         }
-         
-         Socket broadcaster  = new Socket(broadcast.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-         IPEndPoint local_endpoint = new IPEndPoint(broadcast, port);
+      ~TelemetryServer() {
+         broadcaster.Dispose();
+      }
+
+      public void ExecuteUDPServer() {
          Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}");
 
-         broadcaster.Bind(local_endpoint);
+         this.broadcaster.Bind(this.local_endpoint);
          
-         // SendTo requries a reference to an EndPoint specifically so we do this.
-         // Using IPAddress.Any should allow us to receive a message from any IP
-         EndPoint remote_caller = new IPEndPoint(IPAddress.Any, 0);
-
-         // Attempt to see who's calling
-         // Note: an engineer must connect before data will start sending
-         byte[] message = new byte[BUFFER_SIZE];
-         broadcaster.ReceiveFrom(message, ref remote_caller);
-         Console.WriteLine($"Received '{Encoding.ASCII.GetString(message)}' from {remote_caller}");
-         broadcaster.SendTo(Encoding.ASCII.GetBytes($"init data transmission: {MS_DELAY} ms\n"), remote_caller);
+         this.broadcaster.ReceiveFromAsync(connectionListnerArgs);
 
          while(true) {
-            byte[] sendbuf = Encoding.ASCII.GetBytes(this.telemetry_source.GetJSONTelemetryData());
+            if(connected_clients.Count == 0) {
+               Thread.Sleep(MS_DELAY);
+            }
+            else {
+               byte[] sendbuf = Encoding.ASCII.GetBytes(this.telemetry_source.GetJSONTelemetryData());
+               long start_time_millis = CurrentTimeMillis();
 
-            broadcaster.SendTo(sendbuf, remote_caller);
-            
-            Thread.Sleep(MS_DELAY);
+               foreach ((EndPoint client, long lastHeartbeatMillis) in connected_clients) {
+                  if(lastHeartbeatMillis < (start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS)) {
+                     Console.WriteLine($"Heartbeat timeout for {client} after {(start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS)}ms");
+                     connected_clients.Remove(client);
+                     continue;
+                  }
+                  Console.WriteLine($"Sending to {client}");
+                  this.broadcaster.SendTo(sendbuf, client);
+               }
+
+               Console.WriteLine($"Sleeping for {Math.Max((start_time_millis + MS_DELAY - CurrentTimeMillis()), 0)}ms");
+               Thread.Sleep((int)Math.Max((start_time_millis + MS_DELAY - CurrentTimeMillis()), 0));
+            }
          }
+      }
 
-         broadcaster.Dispose();
+      private SocketAsyncEventArgs BuildConnectionListener() {
+         SocketAsyncEventArgs newConnectionListner = new SocketAsyncEventArgs();
+         connectionListenerBuffer = new byte[BUFFER_SIZE];
+
+         newConnectionListner.Completed += new EventHandler<SocketAsyncEventArgs>(ConnectionHandler);
+         newConnectionListner.SetBuffer(connectionListenerBuffer, 0, BUFFER_SIZE);
+         newConnectionListner.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+
+         return newConnectionListner;
+      }
+
+      void ConnectionHandler(object sender, SocketAsyncEventArgs e) {
+         long connection_request_time_ms = CurrentTimeMillis();
+         Console.WriteLine($"Received '{Encoding.ASCII.GetString(e.Buffer)}' from {e.RemoteEndPoint} at {connection_request_time_ms}");
+
+         if(e.SocketError != SocketError.Success){
+            // A host is no longer connected. Will be removed from connected_clients after heartbeat timeout.
+           Console.WriteLine($"Error {e.SocketError}");
+         }
+         else {
+            Console.WriteLine($"Adding {e.RemoteEndPoint}");
+            connected_clients[e.RemoteEndPoint] = connection_request_time_ms;
+         }
+         e.Dispose();
+         this.connectionListnerArgs = BuildConnectionListener();
+         this.broadcaster.ReceiveFromAsync(connectionListnerArgs);
+      }
+
+      private static long CurrentTimeMillis() {
+         return DateTime.Now.Ticks/TimeSpan.TicksPerMillisecond;
       }
    }
 }

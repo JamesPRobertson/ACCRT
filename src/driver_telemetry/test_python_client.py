@@ -1,10 +1,13 @@
 import json
 import socket
+import time
 
 REMOTE_IP_ADDR = "localhost"
 REMOTE_PORT    = 9000
 
 LOCAL_PORT = 9001
+
+HEARTBEAT_TIME_MS = 1000
 
 def udp_testing():
     # This address must be changed based on your system
@@ -17,7 +20,8 @@ def udp_testing():
     client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, 1000)
 
     client_socket.bind(local_address)
-    client_socket.sendto(b"I request data now", server_address)
+    last_heartbeat = int(time.time() * 1000)
+    client_socket.sendto(b"Attempting connection...", server_address)
 
     message_str = ""
 
@@ -25,6 +29,10 @@ def udp_testing():
     print("Inital message: " + str(initial_message_str, encoding="ASCII"), "\n\n")
 
     while True:
+        if (int(time.time() * 1000) - HEARTBEAT_TIME_MS) > last_heartbeat:
+            client_socket.sendto(b"I'm alive!", server_address)
+            last_heartbeat = int(time.time() * 1000)
+
         message_str = client_socket.recvfrom(bufferSize)[0]
 
         try:
