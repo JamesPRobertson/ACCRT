@@ -111,7 +111,6 @@ namespace Server
 
             if (e.SocketError != SocketError.Success)
             {
-                // A host is no longer connected. Will be removed from connected_clients after heartbeat timeout.
                 Console.WriteLine($"Error {e.SocketError}");
             }
             else
