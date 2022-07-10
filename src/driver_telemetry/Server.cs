@@ -1,5 +1,4 @@
 // Check if all imports are needed.
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -7,45 +6,108 @@ using System.Text;
 using Driver;
 
 namespace Server {
-   class TelemetryServer {
-      const int BUFFER_SIZE = 1024;
+    class TelemetryServer {
+        const int BUFFER_SIZE = 1024;
+        const int MS_DELAY = 50; // 20 Hz
+        const int CONNECTED_CLIENT_TIMEOUT_MS = 5000;
 
-      readonly TelemetryParser telemetry_source;
+        const int DEFAULT_PORT = 9000;
 
-      public TelemetryServer() {
-         telemetry_source = new TelemetryParser();
-      }
+        readonly int port = DEFAULT_PORT;
+        readonly IPAddress broadcast_address = IPAddress.Any;
+        readonly Socket broadcaster;
+        readonly IPEndPoint local_endpoint;
 
-      public void ExecuteUDPServer(string server_ip_address, int port) {
-         IPAddress broadcast = IPAddress.Parse(server_ip_address);
-         Socket broadcaster  = new Socket(broadcast.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-         IPEndPoint local_endpoint = new IPEndPoint(broadcast, port);
-         Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}");
+        private SocketAsyncEventArgs connection_listner_args;
 
-         broadcaster.Bind(local_endpoint);
-         
-         // SendTo requries a reference to an EndPoint specifically so we do this.
-         // Using IPAddress.Any should allow us to receive a message from any IP
-         EndPoint remote_caller = new IPEndPoint(IPAddress.Any, 0);
+        readonly TelemetryParser telemetry_source;
 
+        readonly Dictionary<EndPoint, long> connected_clients = new();
 
-         // Attempt to see who's calling
-         // Note: an engineer must connect before data will start sending
-         byte[] message = new byte[BUFFER_SIZE];
-         broadcaster.ReceiveFrom(message, ref remote_caller);
-         Console.WriteLine($"Received '{Encoding.ASCII.GetString(message)}' from {remote_caller}");
-         broadcaster.SendTo(Encoding.ASCII.GetBytes("Thanks!\n"), remote_caller);
+        public TelemetryServer(string[] args) {
+            telemetry_source = new TelemetryParser();
 
-         while(true) {
-            string string_data = String.Join("\n", this.telemetry_source.GetTelemetryData());
-            byte[] sendbuf = Encoding.ASCII.GetBytes(string_data);
+            if (args.Length >= 2) {
+                broadcast_address = IPAddress.Parse(args[0]);
+                port = Int32.Parse(args[1]);
+            }
 
-            broadcaster.SendTo(sendbuf, remote_caller);
-            
-            // 20 Hz
-            Thread.Sleep(50);
-         }
-         broadcaster.Dispose();
-      }
-   }
+            broadcaster = new Socket(broadcast_address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+            local_endpoint = new IPEndPoint(broadcast_address, port);
+
+            connection_listner_args = BuildConnectionListener();
+        }
+
+        ~TelemetryServer() {
+            broadcaster.Dispose();
+            connection_listner_args.Dispose();
+        }
+
+        public void ExecuteUDPServer() {
+            Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}\nPress 'Q' to exit.");
+
+            broadcaster.Bind(local_endpoint);
+
+            broadcaster.ReceiveFromAsync(connection_listner_args);
+
+            do {
+                while (!Console.KeyAvailable) {
+                    if (connected_clients.Count == 0) {
+                        Thread.Sleep(MS_DELAY);
+                    } else {
+                        byte[] sendbuf = Encoding.ASCII.GetBytes(telemetry_source.GetJSONTelemetryData());
+                        long start_time_millis = CurrentTimeMillis();
+
+                        foreach ((EndPoint client, long lastHeartbeatMillis) in connected_clients) {
+                            if (lastHeartbeatMillis < (start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS)) {
+                                Console.WriteLine($"Heartbeat timeout for {client} after {start_time_millis - lastHeartbeatMillis}ms");
+                                connected_clients.Remove(client);
+                                continue;
+                            }
+
+                            broadcaster.SendTo(sendbuf, client);
+                        }
+
+                        Thread.Sleep((int)Math.Max(start_time_millis + MS_DELAY - CurrentTimeMillis(), 0));
+                    }
+                }
+            } while (Console.ReadKey(true).Key != ConsoleKey.Q);
+
+            Console.WriteLine("Q key pressed, exiting.");
+        }
+
+        private SocketAsyncEventArgs BuildConnectionListener() {
+            SocketAsyncEventArgs new_connection_listner = new();
+            byte[]connection_listener_buffer = new byte[BUFFER_SIZE];
+
+            new_connection_listner.Completed += new(ConnectionHandler);
+            new_connection_listner.SetBuffer(connection_listener_buffer, 0, BUFFER_SIZE);
+            new_connection_listner.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+
+            return new_connection_listner;
+        }
+
+        private void ConnectionHandler(object? sender, SocketAsyncEventArgs e) {
+            long connection_request_time_ms = CurrentTimeMillis();
+
+            if (e.Buffer == null || e.RemoteEndPoint == null) {
+                throw new NullReferenceException();
+            }
+            // For debug purposes
+            //Console.WriteLine($"Received '{Encoding.ASCII.GetString(e.Buffer)}' from {e.RemoteEndPoint} at {connection_request_time_ms}ms");
+
+            if (e.SocketError == SocketError.Success) {
+               Console.WriteLine($"Adding {e.RemoteEndPoint}");
+               connected_clients[e.RemoteEndPoint] = connection_request_time_ms;
+            }
+
+            e.Dispose();
+            connection_listner_args = BuildConnectionListener();
+            broadcaster.ReceiveFromAsync(connection_listner_args);
+        }
+
+        private static long CurrentTimeMillis() {
+            return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        }
+    }
 }
