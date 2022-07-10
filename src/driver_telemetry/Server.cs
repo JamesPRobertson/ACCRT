@@ -42,6 +42,7 @@ namespace Server {
 
       ~TelemetryServer() {
          broadcaster.Dispose();
+         connectionListnerArgs.Dispose();
       }
 
       public void ExecuteUDPServer() {
@@ -86,9 +87,13 @@ namespace Server {
          return newConnectionListner;
       }
 
-      void ConnectionHandler(object sender, SocketAsyncEventArgs e) {
+      void ConnectionHandler(object? sender, SocketAsyncEventArgs e) {
          long connection_request_time_ms = CurrentTimeMillis();
-         Console.WriteLine($"Received '{Encoding.ASCII.GetString(e.Buffer)}' from {e.RemoteEndPoint} at {connection_request_time_ms}");
+
+         if(e.Buffer == null || e.RemoteEndPoint == null) {
+            throw new NullReferenceException();
+         }
+         Console.WriteLine($"Received '{Encoding.ASCII.GetString(e.Buffer)}' from {e.RemoteEndPoint} at {connection_request_time_ms}ms");
 
          if(e.SocketError != SocketError.Success){
             // A host is no longer connected. Will be removed from connected_clients after heartbeat timeout.
