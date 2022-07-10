@@ -72,7 +72,7 @@ else {
     Write-Host "Already in Visual Studio Developer Powershell mode, continuing with build process."
 }
 
-if ((Get-Command "nuget" -ErrorAction SilentlyContinue) -eq $null) {
+if ($null -eq (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
     Invoke-WebRequest $NUGET_DOWNLOAD_PATH -out "$BUILD_TOOLS_DIR\nuget.exe"
 }
 

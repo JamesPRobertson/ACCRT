@@ -52,39 +52,43 @@ namespace Server
 
         public void ExecuteUDPServer()
         {
-            Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}");
+            Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}\nPress 'Q' to exit.");
 
             this.broadcaster.Bind(this.local_endpoint);
 
             this.broadcaster.ReceiveFromAsync(connectionListnerArgs);
 
-            while (true)
+            do
             {
-                if (connected_clients.Count == 0)
+                while (!Console.KeyAvailable)
                 {
-                    Thread.Sleep(MS_DELAY);
-                }
-                else
-                {
-                    byte[] sendbuf = Encoding.ASCII.GetBytes(this.telemetry_source.GetJSONTelemetryData());
-                    long start_time_millis = CurrentTimeMillis();
-
-                    foreach ((EndPoint client, long lastHeartbeatMillis) in connected_clients)
+                    if (connected_clients.Count == 0)
                     {
-                        if (lastHeartbeatMillis < (start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS))
-                        {
-                            Console.WriteLine($"Heartbeat timeout for {client} after {start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS}ms");
-                            connected_clients.Remove(client);
-                            continue;
-                        }
-                        Console.WriteLine($"Sending to {client}");
-                        this.broadcaster.SendTo(sendbuf, client);
+                        Thread.Sleep(MS_DELAY);
                     }
+                    else
+                    {
+                        byte[] sendbuf = Encoding.ASCII.GetBytes(this.telemetry_source.GetJSONTelemetryData());
+                        long start_time_millis = CurrentTimeMillis();
 
-                    Console.WriteLine($"Sleeping for {Math.Max(start_time_millis + MS_DELAY - CurrentTimeMillis(), 0)}ms");
-                    Thread.Sleep((int)Math.Max(start_time_millis + MS_DELAY - CurrentTimeMillis(), 0));
+                        foreach ((EndPoint client, long lastHeartbeatMillis) in connected_clients)
+                        {
+                            if (lastHeartbeatMillis < (start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS))
+                            {
+                                Console.WriteLine($"Heartbeat timeout for {client} after {start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS}ms");
+                                connected_clients.Remove(client);
+                                continue;
+                            }
+                            Console.WriteLine($"Sending to {client}");
+                            this.broadcaster.SendTo(sendbuf, client);
+                        }
+
+                        Console.WriteLine($"Sleeping for {Math.Max(start_time_millis + MS_DELAY - CurrentTimeMillis(), 0)}ms");
+                        Thread.Sleep((int)Math.Max(start_time_millis + MS_DELAY - CurrentTimeMillis(), 0));
+                    }
                 }
-            }
+            } while (Console.ReadKey(true).Key != ConsoleKey.Q);
+            Console.WriteLine("Q key pressed, exiting.");
         }
 
         private SocketAsyncEventArgs BuildConnectionListener()
