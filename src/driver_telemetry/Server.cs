@@ -60,7 +60,7 @@ namespace Server {
 
                         foreach ((EndPoint client, long lastHeartbeatMillis) in connected_clients) {
                             if (lastHeartbeatMillis < (start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS)) {
-                                Console.WriteLine($"Heartbeat timeout for {client} after {start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS}ms");
+                                Console.WriteLine($"Heartbeat timeout for {client} after {start_time_millis - lastHeartbeatMillis}ms");
                                 connected_clients.Remove(client);
                                 continue;
                             }

@@ -249,4 +249,7 @@ paket-files/
 
 # Misc.
 .vscode/
+
+# Added
 .buildtools/
+./src/.buildtools
