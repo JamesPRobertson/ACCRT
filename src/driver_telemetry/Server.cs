@@ -11,17 +11,29 @@ namespace Server {
       const int MS_DELAY    = 50; // 20 Hz
       const string JSON_DELIMITER = "|||";
 
+      const int DEFAULT_PORT = 9000;
+
       readonly TelemetryParser telemetry_source;
 
       public TelemetryServer() {
          telemetry_source = new TelemetryParser();
       }
 
-      public void ExecuteUDPServer(string server_ip_address, int port) {
-         IPAddress broadcast = IPAddress.Parse(server_ip_address);
+      public void ExecuteUDPServer(string[] args) {
+         int port = DEFAULT_PORT;
+         IPAddress broadcast = IPAddress.Any;
+         
+         if (args.Length >= 2) {
+            broadcast = IPAddress.Parse(args[0]);
+            port = Int32.Parse(args[1]);
+         }
+         
          Socket broadcaster  = new Socket(broadcast.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
          IPEndPoint local_endpoint = new IPEndPoint(broadcast, port);
          Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}");
+
+         // For local testing
+         // broadcaster.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
          broadcaster.Bind(local_endpoint);
          
@@ -37,8 +49,7 @@ namespace Server {
          broadcaster.SendTo(Encoding.ASCII.GetBytes($"init data transmission: {MS_DELAY} ms\n"), remote_caller);
 
          while(true) {
-            string json_data = String.Join(JSON_DELIMITER, this.telemetry_source.GetJSONTelemetryData());
-            byte[] sendbuf = Encoding.ASCII.GetBytes(json_data);
+            byte[] sendbuf = Encoding.ASCII.GetBytes(this.telemetry_source.GetJSONTelemetryData());
 
             broadcaster.SendTo(sendbuf, remote_caller);
             

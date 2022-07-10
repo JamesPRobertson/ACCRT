@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace AcpmfData {
+namespace ACCSharedMemoryDefinitions {
    public enum PenaltyShortcut: int {
       None,
       DriveThrough_Cutting,
@@ -281,5 +281,11 @@ namespace AcpmfData {
       public int PitWindowStart;
       public int PitWindowEnd;
       public int isOnline;
+   };
+
+   public struct ACCSharedMemoryDefinitionsPack {
+      public SPageFileGraphics graphics_data;
+      public SPageFilePhysics physics_data;
+      public SPageFileStatic static_data;
    };
 }

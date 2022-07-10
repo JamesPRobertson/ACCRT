@@ -1,4 +1,4 @@
-﻿using AcpmfData;
+﻿using ACCSharedMemoryDefinitions;
 using Server;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -32,21 +32,20 @@ namespace Driver {
          Console.WriteLine(String.Join("\n", this.GetStringTelemetryData()));
       }
 
-      public List<string> GetJSONTelemetryData() {
+      public string GetJSONTelemetryData() {
          this.UpdateAllTelemetrySources();
-
-         List<string> telemetry = new List<string>();
 
          JsonSerializerOptions json_options = new JsonSerializerOptions();
          // For human readability in debug
          //json_options.WriteIndented = true;
          json_options.IncludeFields = true;
 
-         telemetry.Add(JsonSerializer.Serialize<SPageFilePhysics>(this.physics_info, json_options));
-         telemetry.Add(JsonSerializer.Serialize<SPageFileGraphics>(this.graphics_info, json_options));
-         telemetry.Add(JsonSerializer.Serialize<SPageFileStatic>(this.static_info, json_options));
+         ACCSharedMemoryDefinitionsPack packed_data = new ACCSharedMemoryDefinitionsPack();
+         packed_data.graphics_data = this.graphics_info;
+         packed_data.physics_data = this.physics_info;
+         packed_data.static_data = this.static_info;
 
-         return telemetry;
+         return JsonSerializer.Serialize<ACCSharedMemoryDefinitionsPack>(packed_data, json_options);
       }
 
       public List<string> GetStringTelemetryData() {
@@ -122,13 +121,8 @@ namespace Driver {
 
    class CLI {
       public static void Main(string[] args) {
-         if (args.Length < 2) {
-            CustomPrintError("ERROR: Two arguments [IP Address] and [Port] must be supplied!");
-            return;
-         }
-
          TelemetryServer output_server = new TelemetryServer();
-         output_server.ExecuteUDPServer(args[0], Int32.Parse(args[1]));
+         output_server.ExecuteUDPServer(args);
       }
 
       public static void CustomPrintError(string message) {
