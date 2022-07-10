@@ -32,9 +32,6 @@ namespace Server {
          IPEndPoint local_endpoint = new IPEndPoint(broadcast, port);
          Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}");
 
-         // For local testing
-         // broadcaster.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-
          broadcaster.Bind(local_endpoint);
          
          // SendTo requries a reference to an EndPoint specifically so we do this.

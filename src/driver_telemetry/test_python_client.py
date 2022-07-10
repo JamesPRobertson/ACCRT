@@ -16,9 +16,6 @@ def udp_testing():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,  socket.IPPROTO_UDP)
     client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, 1000)
 
-    # For local testing:
-    # client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
     client_socket.bind(local_address)
     client_socket.sendto(b"I request data now", server_address)
 
