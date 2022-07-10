@@ -15,7 +15,7 @@ def udp_testing():
 
     server_address = (REMOTE_IP_ADDR, REMOTE_PORT)
     local_address = ('', LOCAL_PORT)
-    bufferSize = 4096
+    bufferSize = 8192
 
     client_socket = socket.socket(
         socket.AF_INET, socket.SOCK_DGRAM,  socket.IPPROTO_UDP)

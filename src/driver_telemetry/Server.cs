@@ -64,15 +64,15 @@ namespace Server {
                                 connected_clients.Remove(client);
                                 continue;
                             }
-                            Console.WriteLine($"Sending to {client}");
+
                             broadcaster.SendTo(sendbuf, client);
                         }
 
-                        Console.WriteLine($"Sleeping for {Math.Max(start_time_millis + MS_DELAY - CurrentTimeMillis(), 0)}ms");
                         Thread.Sleep((int)Math.Max(start_time_millis + MS_DELAY - CurrentTimeMillis(), 0));
                     }
                 }
             } while (Console.ReadKey(true).Key != ConsoleKey.Q);
+
             Console.WriteLine("Q key pressed, exiting.");
         }
 
