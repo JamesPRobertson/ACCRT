@@ -1,9 +1,7 @@
 using System.Runtime.InteropServices;
 
-namespace ACCSharedMemoryDefinitions
-{
-    public enum PenaltyShortcut : int
-    {
+namespace ACCSharedMemoryDefinitions {
+    public enum PenaltyShortcut : int {
         None,
         DriveThrough_Cutting,
         StopAndGo_10_Cutting,
@@ -34,8 +32,7 @@ namespace ACCSharedMemoryDefinitions
     };
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct SPageFileGraphics
-    {
+    public struct SPageFileGraphics {
         public int packetId;
         public int status;
         public int session;
@@ -101,8 +98,7 @@ namespace ACCSharedMemoryDefinitions
     };
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct SPageFilePhysics
-    {
+    public struct SPageFilePhysics {
         public int packetId;
         public float gas;
         public float brake;
@@ -219,8 +215,7 @@ namespace ACCSharedMemoryDefinitions
     };
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct SPageFileStatic
-    {
+    public struct SPageFileStatic {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
         public string smVersion;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
@@ -287,13 +282,11 @@ namespace ACCSharedMemoryDefinitions
         public int isOnline;
     };
 
-    public struct ACCSharedMemoryDefinitionsPack
-    {
+    public struct ACCSharedMemoryDefinitionsPack {
         public SPageFileGraphics graphics_data;
         public SPageFilePhysics physics_data;
         public SPageFileStatic static_data;
-        public ACCSharedMemoryDefinitionsPack(SPageFileGraphics g, SPageFilePhysics p, SPageFileStatic s)
-        {
+        public ACCSharedMemoryDefinitionsPack(SPageFileGraphics g, SPageFilePhysics p, SPageFileStatic s) {
             graphics_data = g;
             physics_data = p;
             static_data = s;

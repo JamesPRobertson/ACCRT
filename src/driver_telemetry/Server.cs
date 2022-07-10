@@ -5,10 +5,8 @@ using System.Text;
 
 using Driver;
 
-namespace Server
-{
-    class TelemetryServer
-    {
+namespace Server {
+    class TelemetryServer {
         const int BUFFER_SIZE = 1024;
         const int MS_DELAY = 50; // 20 Hz
         const int CONNECTED_CLIENT_TIMEOUT_MS = 5000;
@@ -27,12 +25,10 @@ namespace Server
 
         readonly Dictionary<EndPoint, long> connected_clients = new();
 
-        public TelemetryServer(string[] args)
-        {
+        public TelemetryServer(string[] args) {
             telemetry_source = new TelemetryParser();
 
-            if (args.Length >= 2)
-            {
+            if (args.Length >= 2) {
                 this.broadcast_address = IPAddress.Parse(args[0]);
                 this.port = Int32.Parse(args[1]);
             }
@@ -44,37 +40,28 @@ namespace Server
             this.connectionListnerArgs = BuildConnectionListener();
         }
 
-        ~TelemetryServer()
-        {
+        ~TelemetryServer() {
             broadcaster.Dispose();
             connectionListnerArgs.Dispose();
         }
 
-        public void ExecuteUDPServer()
-        {
+        public void ExecuteUDPServer() {
             Console.WriteLine($"Beginning UDP broadcast on: {local_endpoint}\nPress 'Q' to exit.");
 
             this.broadcaster.Bind(this.local_endpoint);
 
             this.broadcaster.ReceiveFromAsync(connectionListnerArgs);
 
-            do
-            {
-                while (!Console.KeyAvailable)
-                {
-                    if (connected_clients.Count == 0)
-                    {
+            do {
+                while (!Console.KeyAvailable) {
+                    if (connected_clients.Count == 0) {
                         Thread.Sleep(MS_DELAY);
-                    }
-                    else
-                    {
+                    } else {
                         byte[] sendbuf = Encoding.ASCII.GetBytes(this.telemetry_source.GetJSONTelemetryData());
                         long start_time_millis = CurrentTimeMillis();
 
-                        foreach ((EndPoint client, long lastHeartbeatMillis) in connected_clients)
-                        {
-                            if (lastHeartbeatMillis < (start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS))
-                            {
+                        foreach ((EndPoint client, long lastHeartbeatMillis) in connected_clients) {
+                            if (lastHeartbeatMillis < (start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS)) {
                                 Console.WriteLine($"Heartbeat timeout for {client} after {start_time_millis - CONNECTED_CLIENT_TIMEOUT_MS}ms");
                                 connected_clients.Remove(client);
                                 continue;
@@ -91,8 +78,7 @@ namespace Server
             Console.WriteLine("Q key pressed, exiting.");
         }
 
-        private SocketAsyncEventArgs BuildConnectionListener()
-        {
+        private SocketAsyncEventArgs BuildConnectionListener() {
             SocketAsyncEventArgs newConnectionListner = new();
             connectionListenerBuffer = new byte[BUFFER_SIZE];
 
@@ -103,22 +89,17 @@ namespace Server
             return newConnectionListner;
         }
 
-        void ConnectionHandler(object? sender, SocketAsyncEventArgs e)
-        {
+        void ConnectionHandler(object? sender, SocketAsyncEventArgs e) {
             long connection_request_time_ms = CurrentTimeMillis();
 
-            if (e.Buffer == null || e.RemoteEndPoint == null)
-            {
+            if (e.Buffer == null || e.RemoteEndPoint == null) {
                 throw new NullReferenceException();
             }
             Console.WriteLine($"Received '{Encoding.ASCII.GetString(e.Buffer)}' from {e.RemoteEndPoint} at {connection_request_time_ms}ms");
 
-            if (e.SocketError != SocketError.Success)
-            {
+            if (e.SocketError != SocketError.Success) {
                 Console.WriteLine($"Error {e.SocketError}");
-            }
-            else
-            {
+            } else {
                 Console.WriteLine($"Adding {e.RemoteEndPoint}");
                 connected_clients[e.RemoteEndPoint] = connection_request_time_ms;
             }
@@ -127,8 +108,7 @@ namespace Server
             this.broadcaster.ReceiveFromAsync(connectionListnerArgs);
         }
 
-        private static long CurrentTimeMillis()
-        {
+        private static long CurrentTimeMillis() {
             return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         }
     }

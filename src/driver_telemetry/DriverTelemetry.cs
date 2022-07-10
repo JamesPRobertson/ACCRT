@@ -3,10 +3,8 @@ using Server;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
-namespace Driver
-{
-    class TelemetryParser
-    {
+namespace Driver {
+    class TelemetryParser {
         SPageFilePhysics physics_info;
         SPageFileGraphics graphics_info;
         SPageFileStatic static_info;
@@ -17,13 +15,11 @@ namespace Driver
 
         const string DLL_DATA_FILE = @".\acc_telemetry.dll";
 
-        public TelemetryParser()
-        {
+        public TelemetryParser() {
             InitializeTelemetry();
         }
 
-        ~TelemetryParser()
-        {
+        ~TelemetryParser() {
             Marshal.FreeHGlobal(ptr_physics);
             Marshal.FreeHGlobal(ptr_graphics);
             Marshal.FreeHGlobal(ptr_static);
@@ -32,13 +28,11 @@ namespace Driver
             ptr_static = IntPtr.Zero;
         }
 
-        public void TestPrintData()
-        {
+        public void TestPrintData() {
             Console.WriteLine(String.Join("\n", this.GetStringTelemetryData()));
         }
 
-        public string GetJSONTelemetryData()
-        {
+        public string GetJSONTelemetryData() {
             this.UpdateAllTelemetrySources();
 
             JsonSerializerOptions json_options = new();
@@ -49,8 +43,7 @@ namespace Driver
             return JsonSerializer.Serialize<ACCSharedMemoryDefinitionsPack>(new(this.graphics_info, this.physics_info, this.static_info), json_options);
         }
 
-        public List<string> GetStringTelemetryData()
-        {
+        public List<string> GetStringTelemetryData() {
             UpdateAllTelemetrySources();
 
             List<string> data = new();
@@ -83,8 +76,7 @@ namespace Driver
             return data;
         }
 
-        void InitializeTelemetry()
-        {
+        void InitializeTelemetry() {
             this.physics_info = new SPageFilePhysics();
             this.ptr_physics = Marshal.AllocHGlobal(Marshal.SizeOf(physics_info));
 
@@ -95,8 +87,7 @@ namespace Driver
             this.ptr_static = Marshal.AllocHGlobal(Marshal.SizeOf(static_info));
         }
 
-        void UpdateAllTelemetrySources()
-        {
+        void UpdateAllTelemetrySources() {
             // TODO: maybe update these exception messages
             if (!UpdatePhysicsData(this.ptr_physics, Marshal.SizeOf(physics_info)))
                 throw new System.Exception("Physics data corrupted");
@@ -123,16 +114,13 @@ namespace Driver
         #endregion
     }
 
-    static class CLI
-    {
-        public static void Main(string[] args)
-        {
+    static class CLI {
+        public static void Main(string[] args) {
             TelemetryServer output_server = new(args);
             output_server.ExecuteUDPServer();
         }
 
-        public static void CustomPrintError(string message)
-        {
+        public static void CustomPrintError(string message) {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message);
             Console.ForegroundColor = ConsoleColor.White;
