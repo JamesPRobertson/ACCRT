@@ -40,11 +40,9 @@ namespace Driver {
          //json_options.WriteIndented = true;
          json_options.IncludeFields = true;
 
-         ACCSharedMemoryDefinitionsPack packed_data = new ACCSharedMemoryDefinitionsPack();
-         packed_data.graphics_data = this.graphics_info;
-         packed_data.physics_data = this.physics_info;
-         packed_data.static_data = this.static_info;
-
+         ACCSharedMemoryDefinitionsPack packed_data = new ACCSharedMemoryDefinitionsPack(this.physics_info,
+                                                                                         this.graphics_info,
+                                                                                         this.static_info);
          return JsonSerializer.Serialize<ACCSharedMemoryDefinitionsPack>(packed_data, json_options);
       }
 

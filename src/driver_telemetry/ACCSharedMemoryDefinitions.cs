@@ -287,5 +287,13 @@ namespace ACCSharedMemoryDefinitions {
       public SPageFileGraphics graphics_data;
       public SPageFilePhysics physics_data;
       public SPageFileStatic static_data;
+
+      public ACCSharedMemoryDefinitionsPack(SPageFilePhysics physics_data,
+                                            SPageFileGraphics grahpics_data,
+                                            SPageFileStatic static_data) {
+         this.physics_data  = physics_data;
+         this.graphics_data = grahpics_data;
+         this.static_data   = static_data;
+      }
    };
 }

@@ -18,8 +18,8 @@ namespace Server {
       private Socket broadcaster;
       private IPEndPoint local_endpoint;
 
-      private SocketAsyncEventArgs connectionListnerArgs;
-      private byte[] connectionListenerBuffer;
+      private SocketAsyncEventArgs connection_listener_args;
+      private byte[] connection_listener_buffer;
 
       readonly TelemetryParser telemetry_source;
 
@@ -36,13 +36,13 @@ namespace Server {
          this.broadcaster  = new Socket(this.broadcast_address.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
          this.local_endpoint = new IPEndPoint(this.broadcast_address, this.port);
 
-         connectionListenerBuffer = new byte[BUFFER_SIZE];
-         this.connectionListnerArgs = BuildConnectionListener();
+         connection_listener_buffer = new byte[BUFFER_SIZE];
+         this.connection_listener_args = BuildConnectionListener();
       }
 
       ~TelemetryServer() {
          broadcaster.Dispose();
-         connectionListnerArgs.Dispose();
+         connection_listener_args.Dispose();
       }
 
       public void ExecuteUDPServer() {
@@ -50,7 +50,7 @@ namespace Server {
 
          this.broadcaster.Bind(this.local_endpoint);
          
-         this.broadcaster.ReceiveFromAsync(connectionListnerArgs);
+         this.broadcaster.ReceiveFromAsync(connection_listener_args);
 
          while(true) {
             if(connected_clients.Count == 0) {
@@ -78,10 +78,10 @@ namespace Server {
 
       private SocketAsyncEventArgs BuildConnectionListener() {
          SocketAsyncEventArgs newConnectionListner = new SocketAsyncEventArgs();
-         connectionListenerBuffer = new byte[BUFFER_SIZE];
+         connection_listener_buffer = new byte[BUFFER_SIZE];
 
          newConnectionListner.Completed += new EventHandler<SocketAsyncEventArgs>(ConnectionHandler);
-         newConnectionListner.SetBuffer(connectionListenerBuffer, 0, BUFFER_SIZE);
+         newConnectionListner.SetBuffer(connection_listener_buffer, 0, BUFFER_SIZE);
          newConnectionListner.RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
          return newConnectionListner;
@@ -104,12 +104,12 @@ namespace Server {
             connected_clients[e.RemoteEndPoint] = connection_request_time_ms;
          }
          e.Dispose();
-         this.connectionListnerArgs = BuildConnectionListener();
-         this.broadcaster.ReceiveFromAsync(connectionListnerArgs);
+         this.connection_listener_args = BuildConnectionListener();
+         this.broadcaster.ReceiveFromAsync(connection_listener_args);
       }
 
       private static long CurrentTimeMillis() {
-         return DateTime.Now.Ticks/TimeSpan.TicksPerMillisecond;
+         return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
       }
    }
 }
