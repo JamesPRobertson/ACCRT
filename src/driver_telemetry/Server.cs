@@ -87,7 +87,7 @@ namespace Server {
             return new_connection_listner;
         }
 
-        void ConnectionHandler(object? sender, SocketAsyncEventArgs e) {
+        private void ConnectionHandler(object? sender, SocketAsyncEventArgs e) {
             long connection_request_time_ms = CurrentTimeMillis();
 
             if (e.Buffer == null || e.RemoteEndPoint == null) {
